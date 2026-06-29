@@ -1,8 +1,14 @@
-from fastapi import APIRouter, Depends
+from pathlib import Path
+from uuid import uuid4
 
+from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+
+from app.config import BASE_URL
 from app.core.dependencies import get_seedance_service
+from app.exceptions import OpenRouterError
 from app.schemas.responses import GenerateResponse
 from app.schemas.video_request import VideoRequest
+from app.services.reference_parser import ReferenceParser
 from app.services.seedance import SeedanceService
 
 router = APIRouter(
@@ -15,13 +21,99 @@ router = APIRouter(
     "",
     response_model=GenerateResponse,
 )
-def generate_video(
-    request: VideoRequest,
+async def generate_video(
+    provider: str = Form(...),
+    model: str = Form(...),
+    prompt: str = Form(...),
+    resolution: str = Form(...),
+    aspectRatio: str = Form(...),
+    duration: int = Form(...),
+    mode: str = Form(...),
+    audio: bool = Form(...),
+    projectId: int | None = Form(None),
+
+    files: list[UploadFile] = File(default=[]),
+    aliases: list[str] = Form(default=[]),
+
+    # Keyframes
+    startFrameAlias: str | None = Form(None),
+    endFrameAlias: str | None = Form(None),
+
     service: SeedanceService = Depends(get_seedance_service),
 ):
-    video_path = service.generate(request)
+    try:
+        reference_images = []
+        references: dict[str, str] = {}
 
-    return GenerateResponse(
-        success=True,
-        video_path=video_path,
-    )
+        for index, file in enumerate(files):
+            filename = f"{uuid4().hex}_{file.filename}"
+
+            save_path = Path("storage") / filename
+
+            save_path.parent.mkdir(
+                parents=True,
+                exist_ok=True,
+            )
+
+            with open(save_path, "wb") as buffer:
+                buffer.write(await file.read())
+
+            image_url = f"{BASE_URL}/storage/{filename}"
+
+            reference_images.append(image_url)
+
+            if index < len(aliases):
+                references[aliases[index]] = image_url
+
+        parsed_prompt = ReferenceParser.replace_prompt(
+            prompt,
+            references,
+        )
+
+        start_frame_url = (
+            references.get(startFrameAlias)
+            if startFrameAlias
+            else None
+        )
+
+        end_frame_url = (
+            references.get(endFrameAlias)
+            if endFrameAlias
+            else None
+        )
+
+        request = VideoRequest(
+            prompt=parsed_prompt,
+            provider=provider,
+            model=model,
+            duration=duration,
+            resolution=resolution,
+            aspect_ratio=aspectRatio,
+            generate_audio=audio,
+            reference_images=reference_images,
+            image_to_video=len(reference_images) > 0,
+            project_id=projectId,
+
+            # Keyframes
+            start_frame_url=start_frame_url,
+            end_frame_url=end_frame_url,
+        )
+
+        video_path = service.generate(request)
+
+        return GenerateResponse(
+            success=True,
+            video_path=video_path,
+        )
+
+    except OpenRouterError as e:
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )

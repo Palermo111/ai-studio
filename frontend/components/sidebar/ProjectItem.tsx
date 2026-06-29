@@ -28,50 +28,66 @@ export default function ProjectItem({
 }: ProjectItemProps) {
   return (
     <div
-      className={`mb-2 flex items-center rounded-lg transition ${
-        active
-          ? "bg-violet-600 text-white"
-          : "hover:bg-zinc-900"
-      }`}
+      className={`
+        group
+        mb-1
+        flex
+        items-center
+        rounded-xl
+        transition-all
+        duration-200
+        ${
+          active
+            ? "bg-background border border-border shadow-sm"
+            : "hover:bg-muted/40"
+        }
+      `}
     >
       <button
         onClick={onClick}
-        className="flex flex-1 items-center gap-3 px-3 py-3 text-left"
+        className="flex flex-1 items-center gap-3 px-3 py-2 text-left"
       >
-        <Folder size={18} />
+        <Folder
+          size={18}
+          className={
+            active
+              ? "text-foreground"
+              : "text-muted-foreground group-hover:text-foreground"
+          }
+        />
 
-        <span className="truncate">
+        <span
+          className={`
+            truncate text-sm
+            ${active ? "text-foreground font-medium" : "text-muted-foreground"}
+          `}
+        >
           {project.name}
         </span>
       </button>
 
-      <DropdownMenu>
+      <div className="pr-2 opacity-0 group-hover:opacity-100 transition">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className="rounded-md p-1 hover:bg-muted">
+              <MoreVertical size={18} />
+            </button>
+          </DropdownMenuTrigger>
 
-        <DropdownMenuTrigger asChild>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={onRename}>
+              Переименовать
+            </DropdownMenuItem>
 
-          <button className="mr-2 rounded p-1 hover:bg-black/20">
-            <MoreVertical size={18} />
-          </button>
-
-        </DropdownMenuTrigger>
-
-        <DropdownMenuContent align="end">
-
-          <DropdownMenuItem onClick={onRename}>
-            Переименовать
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            className="text-red-500"
-            onClick={onDelete}
-          >
-            Удалить
-          </DropdownMenuItem>
-
-        </DropdownMenuContent>
-
-      </DropdownMenu>
-
+            <DropdownMenuItem
+              className="text-red-500"
+              onClick={onDelete}
+            >
+              Удалить
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     </div>
   );
 }

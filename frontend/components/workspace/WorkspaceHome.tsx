@@ -1,6 +1,10 @@
 "use client";
 
-import { Folder } from "lucide-react";
+import {
+  AlertCircle,
+  Folder,
+  Sparkles,
+} from "lucide-react";
 
 import { useProjectStore } from "@/store/projectStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
@@ -10,45 +14,150 @@ export default function WorkspaceHome() {
     (state) => state.activeProject
   );
 
-  const setSection = useWorkspaceStore(
-    (state) => state.setSection
-  );
+  const { status, videoPath, error, setSection } =
+    useWorkspaceStore();
 
+  // LOADING
+  if (status === "generating") {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="text-center">
+          <div className="mx-auto mb-6 h-14 w-14 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+
+          <h2 className="text-2xl font-semibold">
+            Генерация видео
+          </h2>
+
+          <p className="mt-2 text-muted-foreground">
+            Обычно это занимает 1–2 минуты
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // ERROR
+  if (status === "error") {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
+          <AlertCircle className="mx-auto mb-4 text-red-500" size={42} />
+
+          <h2 className="text-xl font-semibold">
+            Ошибка генерации
+          </h2>
+
+          <p className="mt-2 text-muted-foreground">
+            {error}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // SUCCESS (единая система центра)
+  if (status === "success" && videoPath) {
+    return (
+      <div className="flex h-full items-center justify-center">
+        <div className="w-full flex items-center justify-center">
+          <video
+            controls
+            autoPlay
+            src={videoPath}
+            className="max-h-[70vh] w-auto rounded-2xl shadow-xl"
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // HERO (ИДЕАЛЬНЫЙ ЦЕНТР, БЕЗ СМЕЩЕНИЙ)
   return (
-    <div className="p-8">
+    <div className="flex h-full items-center justify-center px-10">
+      <div className="w-full max-w-4xl text-center">
 
-      <h1 className="mb-8 text-3xl font-bold">
-        {activeProject?.name}
-      </h1>
+        {/* ICON */}
+        <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-card shadow-[0_10px_35px_rgba(0,0,0,0.06)]">
+          <Sparkles className="text-orange-500" size={32} />
+        </div>
 
-      <div className="space-y-3">
+        {/* TITLE */}
+        <h1 className="text-5xl font-semibold tracking-tight text-foreground">
+          Seedance
+        </h1>
 
-        <button
-          onClick={() => setSection("images")}
-          className="flex w-full items-center gap-3 rounded-lg border border-zinc-800 p-4 hover:bg-zinc-900"
-        >
-          <Folder size={20} />
-          Изображения
-        </button>
+        {/* SUBTITLE */}
+        <p className="mt-4 text-lg text-muted-foreground">
+          Продвинутая модель генерации видео от ByteDance
+        </p>
 
-        <button
-          onClick={() => setSection("videos")}
-          className="flex w-full items-center gap-3 rounded-lg border border-zinc-800 p-4 hover:bg-zinc-900"
-        >
-          <Folder size={20} />
-          Видео
-        </button>
+        {/* DESCRIPTION */}
+        <p className="mx-auto mt-6 max-w-2xl text-sm leading-6 text-muted-foreground">
+          Seedance 2.0 — продвинутая модель генерации видео для
+          динамичного сторителлинга, плавной анимации и быстрой
+          работы с визуальными концептами. Поддерживает текст,
+          изображения, видео и аудио в одном пайплайне.
+        </p>
 
-        <button
-          onClick={() => setSection("audio")}
-          className="flex w-full items-center gap-3 rounded-lg border border-zinc-800 p-4 hover:bg-zinc-900"
-        >
-          <Folder size={20} />
-          Аудио
-        </button>
+        {/* TAGS */}
+        <div className="mt-10 flex flex-wrap justify-center gap-3">
+          {[
+            "image-to-video",
+            "video-to-video",
+            "генерация с аудио",
+            "работа с референсами",
+            "динамичный сторителлинг",
+          ].map((item) => (
+            <div
+              key={item}
+              className="rounded-full bg-card px-4 py-2 text-sm text-muted-foreground"
+            >
+              {item}
+            </div>
+          ))}
+        </div>
+
+        {/* ACTIONS */}
+        {activeProject && (
+          <div className="mt-14 grid grid-cols-3 gap-4">
+
+            <button
+              onClick={() => setSection("images")}
+              className="rounded-2xl border border-border bg-card p-6 transition hover:shadow-sm"
+            >
+              <Folder className="mx-auto mb-3 text-muted-foreground" />
+              <div className="font-medium">Images</div>
+              <div className="text-sm text-muted-foreground">
+                Генерация изображений
+              </div>
+            </button>
+
+            <button
+              onClick={() => setSection("videos")}
+              className="rounded-2xl border border-border bg-card p-6 transition hover:shadow-sm"
+            >
+              <Folder className="mx-auto mb-3 text-muted-foreground" />
+              <div className="font-medium">Videos</div>
+              <div className="text-sm text-muted-foreground">
+                Генерация видео
+              </div>
+            </button>
+
+            <button
+              onClick={() => setSection("audio")}
+              className="rounded-2xl border border-border bg-card p-6 transition hover:shadow-sm"
+            >
+              <Folder className="mx-auto mb-3 text-muted-foreground" />
+              <div className="font-medium">Audio</div>
+              <div className="text-sm text-muted-foreground">
+                Генерация аудио
+              </div>
+            </button>
+
+          </div>
+        )}
 
       </div>
-
     </div>
   );
 }

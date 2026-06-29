@@ -23,7 +23,7 @@ class OpenRouterClient:
             raise ValueError("Не найден OPENROUTER_API_KEY")
 
     @property
-    def headers(self):
+    def headers(self) -> dict:
         return {
             "Authorization": f"Bearer {self.api_key}",
             "Content-Type": "application/json",
@@ -46,12 +46,12 @@ class OpenRouterClient:
 
     def post(self, endpoint: str, data: dict) -> dict:
         try:
-            response = httpx.post(
-                f"{self.base_url}/{endpoint}",
-                headers=self.headers,
-                json=data,
-                timeout=300,
-            )
+            with httpx.Client(timeout=300) as client:
+                response = client.post(
+                    f"{self.base_url}/{endpoint}",
+                    headers=self.headers,
+                    json=data,
+                )
 
             self._check_response(response)
 
@@ -64,11 +64,11 @@ class OpenRouterClient:
 
     def get(self, endpoint: str) -> dict:
         try:
-            response = httpx.get(
-                f"{self.base_url}/{endpoint}",
-                headers=self.headers,
-                timeout=300,
-            )
+            with httpx.Client(timeout=300) as client:
+                response = client.get(
+                    f"{self.base_url}/{endpoint}",
+                    headers=self.headers,
+                )
 
             self._check_response(response)
 
@@ -81,11 +81,11 @@ class OpenRouterClient:
 
     def get_absolute(self, url: str) -> dict:
         try:
-            response = httpx.get(
-                url,
-                headers=self.headers,
-                timeout=300,
-            )
+            with httpx.Client(timeout=300) as client:
+                response = client.get(
+                    url,
+                    headers=self.headers,
+                )
 
             self._check_response(response)
 
@@ -98,13 +98,13 @@ class OpenRouterClient:
 
     def download(self, url: str) -> bytes:
         try:
-            response = httpx.get(
-                url,
-                headers={
-                    "Authorization": f"Bearer {self.api_key}",
-                },
-                timeout=300,
-            )
+            with httpx.Client(timeout=300) as client:
+                response = client.get(
+                    url,
+                    headers={
+                        "Authorization": f"Bearer {self.api_key}",
+                    },
+                )
 
             self._check_response(response)
 
@@ -124,19 +124,31 @@ class OpenRouterClient:
 
         if response.status_code >= 400:
             try:
-                message = response.json()
+                data = response.json()
+
+                if isinstance(data, dict):
+                    message = (
+                        data.get("error", {})
+                        .get("message")
+                    )
+
+                    if not message:
+                        message = str(data)
+                else:
+                    message = str(data)
+
             except Exception:
                 message = response.text
 
             raise OpenRouterError(message)
 
-        try:
-            if (
-                "application/json"
-                in response.headers.get("Content-Type", "")
-            ):
+        if (
+            "application/json"
+            in response.headers.get("Content-Type", "")
+        ):
+            try:
                 response.json()
-        except Exception as e:
-            raise InvalidResponseError(
-                "OpenRouter вернул некорректный JSON."
-            ) from e
+            except Exception as e:
+                raise InvalidResponseError(
+                    "OpenRouter вернул некорректный JSON."
+                ) from e

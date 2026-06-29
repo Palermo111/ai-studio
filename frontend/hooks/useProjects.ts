@@ -58,7 +58,7 @@ export function useDeleteProject() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: deleteProject,
+    mutationFn: (id: number) => deleteProject(id),
 
     onSuccess: () => {
       queryClient.invalidateQueries({

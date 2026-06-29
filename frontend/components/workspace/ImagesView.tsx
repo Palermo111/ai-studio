@@ -7,29 +7,29 @@ import { useWorkspaceStore } from "@/store/workspaceStore";
 import { useFiles } from "@/hooks/useFiles";
 
 export default function ImagesView() {
-  const activeProject = useProjectStore(
-    (state) => state.activeProject
-  );
+  const activeProject = useProjectStore((s) => s.activeProject);
+  const setSection = useWorkspaceStore((s) => s.setSection);
 
-  const setSection = useWorkspaceStore(
-    (state) => state.setSection
-  );
+  if (!activeProject) {
+    return (
+      <div className="flex h-full items-center justify-center text-muted-foreground">
+        Выберите проект для просмотра изображений
+      </div>
+    );
+  }
 
   const {
     data: files,
     isLoading,
     error,
-  } = useFiles(
-    activeProject?.id,
-    "images"
-  );
+  } = useFiles(activeProject.id, "images");
 
   return (
     <div className="p-8">
 
       <button
         onClick={() => setSection("home")}
-        className="mb-6 flex items-center gap-2 text-zinc-400 transition hover:text-white"
+        className="mb-6 flex items-center gap-2 text-zinc-400 hover:text-white"
       >
         <ArrowLeft size={18} />
         Назад
@@ -40,9 +40,7 @@ export default function ImagesView() {
       </h1>
 
       {isLoading && (
-        <p className="text-zinc-500">
-          Загрузка...
-        </p>
+        <p className="text-zinc-500">Загрузка...</p>
       )}
 
       {error && (
@@ -64,7 +62,6 @@ export default function ImagesView() {
             className="flex items-center gap-3 rounded-lg border border-zinc-800 p-3"
           >
             <Image size={18} />
-
             <span>{file.name}</span>
           </div>
         ))}

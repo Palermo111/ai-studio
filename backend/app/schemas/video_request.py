@@ -30,3 +30,12 @@ class VideoRequest:
     image_to_video: bool = False
 
     output_dir: str = DEFAULT_OUTPUT_DIR
+
+    # Если None — сохраняем в storage/videos
+    # Если указано имя проекта —
+    # сохраняем в projects/<project>/videos
+    project_id: int | None = None
+
+    # Keyframes
+    start_frame_url: str | None = None
+    end_frame_url: str | None = None

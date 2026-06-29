@@ -1,67 +1,44 @@
-import AppLayout from "@/components/layout/AppLayout";
+"use client";
 
 import Sidebar from "@/components/sidebar/Sidebar";
 import Workspace from "@/components/workspace/Workspace";
+import AIPanel from "@/components/right-panel/AIPanel";
+import PromptBar from "@/components/prompt-bar/PromptBar";
 
 export default function HomePage() {
   return (
-    <AppLayout
-      left={<Sidebar />}
+    <div className="flex h-screen w-full bg-background text-foreground">
 
-      center={<Workspace />}
+      {/* LEFT */}
+      <aside className="w-[260px] border-r border-border bg-card">
+        <Sidebar />
+      </aside>
 
-      right={
-        <div className="p-5">
+      {/* CENTER */}
+      <main className="flex flex-1 flex-col overflow-hidden">
 
-          <h2 className="mb-6 text-lg font-semibold">
-            Настройки
-          </h2>
-
-          <div className="space-y-5">
-
-            <div className="rounded-xl bg-zinc-900 p-4">
-              Provider
-            </div>
-
-            <div className="rounded-xl bg-zinc-900 p-4">
-              Model
-            </div>
-
-            <div className="rounded-xl bg-zinc-900 p-4">
-              Resolution
-            </div>
-
-            <div className="rounded-xl bg-zinc-900 p-4">
-              Duration
-            </div>
-
-            <div className="rounded-xl bg-zinc-900 p-4">
-              Aspect Ratio
-            </div>
-
-          </div>
-
+        {/* HEADER LAYER (стабилизирует UX) */}
+        <div className="h-12 border-b border-border flex items-center px-4 text-sm text-muted-foreground">
+          AI Studio
         </div>
-      }
 
-      bottom={
-        <div className="p-5">
-
-          <div className="flex gap-3">
-
-            <input
-              className="flex-1 rounded-xl border border-zinc-800 bg-zinc-900 p-4 outline-none"
-              placeholder="Введите промпт..."
-            />
-
-            <button className="rounded-xl bg-blue-600 px-8 hover:bg-blue-500">
-              Generate
-            </button>
-
-          </div>
-
+        {/* WORKSPACE */}
+        <div className="flex-1 overflow-hidden">
+          <Workspace />
         </div>
-      }
-    />
+
+      </main>
+
+      {/* RIGHT */}
+      <aside className="w-[320px] border-l border-border bg-card">
+        <AIPanel />
+      </aside>
+
+      {/* BOTTOM PROMPT */}
+      <div className="fixed bottom-0 left-[260px] right-[320px]">
+        <PromptBar />
+      </div>
+
+    </div>
   );
 }

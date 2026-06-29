@@ -1,10 +1,19 @@
-.venv/
+# backend storage (видео и файлы)
+backend/storage/
+backend/projects/
+backend/data/*.db
+
+# env
+.env
+.env.local
+
+# python
 __pycache__/
 *.pyc
 
-.env
+# node
+node_modules/
+.next/
 
-output/*
-!output/.gitkeep
-
-.vscode/
+# logs
+*.log
