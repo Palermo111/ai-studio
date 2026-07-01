@@ -8,6 +8,7 @@ import {
 
 import { useProjectStore } from "@/store/projectStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import GeneratedVideoCard from "./video/GeneratedVideoCard";
 
 export default function WorkspaceHome() {
   const activeProject = useProjectStore(
@@ -15,11 +16,11 @@ export default function WorkspaceHome() {
   );
 
   const {
-  status,
-  videoPath,
-  error,
-  setSection,
-} = useWorkspaceStore();
+    status,
+    video,
+    error,
+    setSection,
+  } = useWorkspaceStore();
 
   // LOADING
   if (status === "generating") {
@@ -63,24 +64,18 @@ export default function WorkspaceHome() {
   }
 
   // SUCCESS
-  if (status === "success" && videoPath) {
+  if (status === "success" && video) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex h-full w-full items-center justify-center">
-          <video
-            controls
-            autoPlay
-            src={videoPath}
-            className="
-              max-h-[80vh]
-              max-w-full
-              h-auto
-              w-auto
-              rounded-2xl
-              shadow-xl
-            "
-          />
-        </div>
+      <div
+        className="
+          w-full
+          flex
+          justify-center
+          pt-6
+          pb-10
+        "
+      >
+        <GeneratedVideoCard />
       </div>
     );
   }

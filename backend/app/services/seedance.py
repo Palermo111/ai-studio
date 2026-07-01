@@ -40,6 +40,23 @@ class SeedanceService:
         # А фронтенду возвращаем публичный URL
         return self._build_public_url(video_path)
 
+    def delete_video(
+        self,
+        filename: str,
+        project_id: int | None = None,
+    ) -> None:
+        request = VideoRequest(
+            prompt="",
+            project_id=project_id,
+        )
+
+        output_dir = self._get_output_dir(request)
+
+        path = os.path.join(output_dir, filename)
+
+        if os.path.exists(path):
+            os.remove(path)
+
     def _submit_job(self, request: VideoRequest) -> dict:
         payload = self._build_payload(request)
 
@@ -98,11 +115,12 @@ class SeedanceService:
 
         if frame_images:
             payload["frame_images"] = frame_images
-            
+
         print("=" * 50)
         print("MODEL:", request.model)
         print(payload)
         print("=" * 50)
+
         return payload
 
     def _wait_for_completion(self, polling_url: str) -> None:

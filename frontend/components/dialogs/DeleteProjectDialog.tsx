@@ -2,14 +2,18 @@
 
 interface DeleteProjectDialogProps {
   open: boolean;
-  projectName: string;
+  title: string;
+  itemName: string;
+  itemType: string;
   onCancel: () => void;
   onConfirm: () => void;
 }
 
 export default function DeleteProjectDialog({
   open,
-  projectName,
+  title,
+  itemName,
+  itemType,
   onCancel,
   onConfirm,
 }: DeleteProjectDialogProps) {
@@ -21,15 +25,15 @@ export default function DeleteProjectDialog({
       <div className="w-[420px] rounded-2xl border border-border bg-card p-6 shadow-xl">
 
         <h2 className="text-lg font-semibold text-foreground">
-          Удалить проект
+          {title}
         </h2>
 
         <p className="mt-4 text-sm text-muted-foreground">
-          Вы действительно хотите удалить проект
+          Вы действительно хотите удалить {itemType}
         </p>
 
         <p className="mt-2 text-sm font-semibold text-foreground">
-          «{projectName}»
+          «{itemName}»
         </p>
 
         <p className="mt-4 text-xs text-red-500">

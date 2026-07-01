@@ -1,5 +1,6 @@
 from pathlib import Path
 from uuid import uuid4
+import os
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
@@ -94,7 +95,6 @@ async def generate_video(
             image_to_video=len(reference_images) > 0,
             project_id=projectId,
 
-            # Keyframes
             start_frame_url=start_frame_url,
             end_frame_url=end_frame_url,
         )
@@ -111,6 +111,27 @@ async def generate_video(
             status_code=400,
             detail=str(e),
         )
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
+
+@router.delete("/video")
+async def delete_video(
+    filename: str,
+    projectId: int | None = None,
+    service: SeedanceService = Depends(get_seedance_service),
+):
+    try:
+        service.delete_video(
+            filename=filename,
+            project_id=projectId,
+        )
+
+        return {"success": True}
 
     except Exception as e:
         raise HTTPException(

@@ -9,22 +9,35 @@ import { useGenerationStore } from "@/store/generationStore";
 import { calculateGenerationPrice } from "@/lib/cost/calculateCost";
 import { getUsdRate } from "@/lib/cost/getUsdRate";
 
-import { buildFormData } from "@/lib/buildFormData";
-import { generateVideo } from "@/lib/api/generate";
+const DEV_MODE = true;
+
+const DEV_VIDEO =
+  "http://localhost:8000/storage/videos/seedance_20260701_143602.mp4";
 
 export default function GenerateButton() {
   const status = useWorkspaceStore((state) => state.status);
   const setStatus = useWorkspaceStore((state) => state.setStatus);
-  const setVideoPath = useWorkspaceStore((state) => state.setVideoPath);
+  const setVideo = useWorkspaceStore((state) => state.setVideo);
   const setError = useWorkspaceStore((state) => state.setError);
 
   const prompt = useGenerationStore((state) => state.prompt);
   const model = useGenerationStore((state) => state.model);
+
   const resolution = useGenerationStore(
     (state) => state.resolution
   );
-  const duration = useGenerationStore((state) => state.duration);
-  const audio = useGenerationStore((state) => state.audio);
+
+  const duration = useGenerationStore(
+    (state) => state.duration
+  );
+
+  const audio = useGenerationStore(
+    (state) => state.audio
+  );
+
+  const mode = useGenerationStore(
+    (state) => state.mode
+  );
 
   const [usdRate, setUsdRate] = useState(75);
 
@@ -41,22 +54,31 @@ export default function GenerateButton() {
   );
 
   const isDisabled =
-    status === "generating" || !prompt?.trim();
+    status === "generating" || !prompt.trim();
 
   async function handleGenerate() {
     if (isDisabled) return;
 
     try {
       setError(null);
-      setVideoPath(null);
+      setVideo(null);
       setStatus("generating");
 
-      const formData = buildFormData();
+      if (DEV_MODE) {
+        setVideo({
+          path: DEV_VIDEO,
+          resolution,
+          duration,
+          mode,
+          audio,
+        });
 
-      const result = await generateVideo(formData);
+        setStatus("success");
+        return;
+      }
 
-      setVideoPath(result.video_path);
-      setStatus("success");
+      // Здесь позже снова будет настоящая генерация
+
     } catch (error) {
       setStatus("error");
 

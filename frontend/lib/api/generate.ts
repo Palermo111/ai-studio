@@ -23,3 +23,32 @@ export async function generateVideo(formData: FormData) {
 
   return response.json();
 }
+
+export async function deleteVideo(
+  filename: string,
+  projectId?: number
+) {
+  const params = new URLSearchParams({
+    filename,
+  });
+
+  if (projectId !== undefined) {
+    params.append(
+      "projectId",
+      String(projectId)
+    );
+  }
+
+  const response = await fetch(
+    `http://localhost:8000/generate/video?${params.toString()}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Не удалось удалить видео");
+  }
+
+  return response.json();
+}

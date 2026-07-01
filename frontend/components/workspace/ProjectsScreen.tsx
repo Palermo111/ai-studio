@@ -198,7 +198,9 @@ export default function ProjectsScreen() {
 
       <DeleteProjectDialog
         open={deleteOpen}
-        projectName={targetProject?.name ?? ""}
+        title="Удалить проект"
+        itemType="проект"
+        itemName={targetProject?.name ?? ""}
         onCancel={() => setDeleteOpen(false)}
         onConfirm={handleDelete}
       />

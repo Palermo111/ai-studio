@@ -13,12 +13,21 @@ export type GenerationStatus =
   | "success"
   | "error";
 
+export interface GeneratedVideo {
+  path: string;
+
+  resolution: string;
+  duration: number;
+  mode: string;
+  audio: boolean;
+}
+
 interface WorkspaceState {
   section: WorkspaceSection;
 
   status: GenerationStatus;
 
-  videoPath: string | null;
+  video: GeneratedVideo | null;
 
   error: string | null;
 
@@ -26,7 +35,7 @@ interface WorkspaceState {
 
   setStatus: (status: GenerationStatus) => void;
 
-  setVideoPath: (videoPath: string | null) => void;
+  setVideo: (video: GeneratedVideo | null) => void;
 
   setError: (error: string | null) => void;
 
@@ -38,7 +47,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
 
   status: "idle",
 
-  videoPath: null,
+  video: null,
 
   error: null,
 
@@ -52,9 +61,9 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
       status,
     }),
 
-  setVideoPath: (videoPath) =>
+  setVideo: (video) =>
     set({
-      videoPath,
+      video,
     }),
 
   setError: (error) =>
@@ -65,7 +74,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
   reset: () =>
     set({
       status: "idle",
-      videoPath: null,
+      video: null,
       error: null,
     }),
 }));

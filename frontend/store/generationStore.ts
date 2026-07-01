@@ -48,9 +48,9 @@ export const useGenerationStore = create<GenerationStore>((set) => ({
 
   model: "bytedance/seedance-2.0",
 
-  resolution: "1080p",
+  resolution: "480p",
   aspectRatio: "9:16",
-  duration: 5,
+  duration: 4,
   mode: "Pro",
   audio: true,
 
