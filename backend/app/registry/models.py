@@ -38,6 +38,7 @@ VIDEO_MODELS = [
             "480p",
             "720p",
             "1080p",
+            "4K",
         ],
 
         aspect_ratios=[

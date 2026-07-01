@@ -16,7 +16,7 @@ export default function AspectRatioSection() {
   );
 
   return (
-    <Section title="Aspect Ratio">
+    <Section title="Соотношение сторон">
       <OptionGroup
         value={aspectRatio}
         options={ASPECT_RATIOS}

@@ -3,6 +3,7 @@
 interface Option {
   value: string;
   label: string;
+  disabled?: boolean;
 }
 
 interface OptionGroupProps {
@@ -25,7 +26,11 @@ export default function OptionGroup({
           <button
             key={option.value}
             type="button"
-            onClick={() => onChange(option.value)}
+            disabled={option.disabled}
+            onClick={() =>
+              !option.disabled &&
+              onChange(option.value)
+            }
             className={`
               h-10
               rounded-xl
@@ -35,8 +40,17 @@ export default function OptionGroup({
               font-medium
               transition-all
               duration-200
+
               ${
-                selected
+                option.disabled
+                  ? `
+                    cursor-not-allowed
+                    border-border
+                    bg-muted
+                    text-muted-foreground
+                    opacity-50
+                  `
+                  : selected
                   ? `
                     border-primary
                     bg-primary

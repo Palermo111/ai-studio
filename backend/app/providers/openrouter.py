@@ -123,6 +123,12 @@ class OpenRouterClient:
             )
 
         if response.status_code >= 400:
+            print("=" * 80)
+            print("STATUS:", response.status_code)
+            print("RESPONSE:")
+            print(response.text)
+            print("=" * 80)
+            
             try:
                 data = response.json()
 

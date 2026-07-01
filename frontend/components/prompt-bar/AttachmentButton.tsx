@@ -58,7 +58,12 @@ export default function AttachmentButton() {
     <>
       <button
         type="button"
-        onClick={() => inputRef.current?.click()}
+        onClick={() => {
+          if (inputRef.current) {
+            inputRef.current.value = "";
+            inputRef.current.click();
+          }
+        }}
         className="
           flex
           h-10
@@ -84,7 +89,10 @@ export default function AttachmentButton() {
         multiple
         type="file"
         accept="image/*,video/*,audio/*"
-        onChange={(e) => handleFiles(e.target.files)}
+        onChange={(e) => {
+          handleFiles(e.target.files);
+          e.target.value = "";
+        }}
       />
     </>
   );

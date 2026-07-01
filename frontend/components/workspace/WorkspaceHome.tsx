@@ -14,8 +14,12 @@ export default function WorkspaceHome() {
     (state) => state.activeProject
   );
 
-  const { status, videoPath, error, setSection } =
-    useWorkspaceStore();
+  const {
+  status,
+  videoPath,
+  error,
+  setSection,
+} = useWorkspaceStore();
 
   // LOADING
   if (status === "generating") {
@@ -41,7 +45,10 @@ export default function WorkspaceHome() {
     return (
       <div className="flex h-full items-center justify-center">
         <div className="rounded-2xl border border-red-200 bg-red-50 p-8 text-center">
-          <AlertCircle className="mx-auto mb-4 text-red-500" size={42} />
+          <AlertCircle
+            className="mx-auto mb-4 text-red-500"
+            size={42}
+          />
 
           <h2 className="text-xl font-semibold">
             Ошибка генерации
@@ -55,43 +62,49 @@ export default function WorkspaceHome() {
     );
   }
 
-  // SUCCESS (единая система центра)
+  // SUCCESS
   if (status === "success" && videoPath) {
     return (
       <div className="flex h-full items-center justify-center">
-        <div className="w-full flex items-center justify-center">
+        <div className="flex h-full w-full items-center justify-center">
           <video
             controls
             autoPlay
             src={videoPath}
-            className="max-h-[70vh] w-auto rounded-2xl shadow-xl"
+            className="
+              max-h-[80vh]
+              max-w-full
+              h-auto
+              w-auto
+              rounded-2xl
+              shadow-xl
+            "
           />
         </div>
       </div>
     );
   }
 
-  // HERO (ИДЕАЛЬНЫЙ ЦЕНТР, БЕЗ СМЕЩЕНИЙ)
+  // HERO
   return (
     <div className="flex h-full items-center justify-center px-10">
       <div className="w-full max-w-4xl text-center">
 
-        {/* ICON */}
         <div className="mx-auto mb-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-card shadow-[0_10px_35px_rgba(0,0,0,0.06)]">
-          <Sparkles className="text-orange-500" size={32} />
+          <Sparkles
+            className="text-orange-500"
+            size={32}
+          />
         </div>
 
-        {/* TITLE */}
         <h1 className="text-5xl font-semibold tracking-tight text-foreground">
           Seedance
         </h1>
 
-        {/* SUBTITLE */}
         <p className="mt-4 text-lg text-muted-foreground">
           Продвинутая модель генерации видео от ByteDance
         </p>
 
-        {/* DESCRIPTION */}
         <p className="mx-auto mt-6 max-w-2xl text-sm leading-6 text-muted-foreground">
           Seedance 2.0 — продвинутая модель генерации видео для
           динамичного сторителлинга, плавной анимации и быстрой
@@ -99,7 +112,6 @@ export default function WorkspaceHome() {
           изображения, видео и аудио в одном пайплайне.
         </p>
 
-        {/* TAGS */}
         <div className="mt-10 flex flex-wrap justify-center gap-3">
           {[
             "image-to-video",
@@ -117,10 +129,8 @@ export default function WorkspaceHome() {
           ))}
         </div>
 
-        {/* ACTIONS */}
         {activeProject && (
           <div className="mt-14 grid grid-cols-3 gap-4">
-
             <button
               onClick={() => setSection("images")}
               className="rounded-2xl border border-border bg-card p-6 transition hover:shadow-sm"
@@ -153,7 +163,6 @@ export default function WorkspaceHome() {
                 Генерация аудио
               </div>
             </button>
-
           </div>
         )}
 

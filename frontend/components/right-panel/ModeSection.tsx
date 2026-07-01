@@ -16,7 +16,7 @@ export default function ModeSection() {
   );
 
   return (
-    <Section title="Mode">
+    <Section title="Режим">
       <OptionGroup
         value={mode}
         onChange={(value) =>

@@ -77,7 +77,7 @@ export default function UploadPreview({
   return (
     <div
       style={{
-        borderBottom: "1px solid #27272a",
+        borderBottom: "1px solid #F2ECE5",
         padding: "0 16px 12px",
       }}
     >
@@ -124,12 +124,16 @@ export default function UploadPreview({
                         height: "100%",
                         borderRadius: 12,
                         overflow: "hidden",
-                        border:
-                          isStart || isEnd
-                            ? "2px solid #7c3aed"
-                            : "1px solid #3f3f46",
-                        background: "#18181b",
+
+                        border: "1px solid #E9E2D8",
+
+                        background: "#FFFFFF",
+
                         cursor: "pointer",
+
+                        transition: "all .2s ease",
+
+                        boxShadow: "0 2px 8px rgba(0,0,0,.04)",
                       }}
                     >
                       <img
@@ -221,7 +225,7 @@ export default function UploadPreview({
                         textAlign: "center",
                         fontSize: 11,
                         fontWeight: 600,
-                        color: "#8b5cf6",
+                        color: "#B8783A",
                       }}
                     >
                       {isStart && "Первый"}

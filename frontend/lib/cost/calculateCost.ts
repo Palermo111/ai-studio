@@ -1,13 +1,13 @@
-import { useGenerationStore } from "@/store/generationStore";
+import { Resolution } from "@/store/generationStore";
 import { SEEDANCE } from "@/constants/models/seedance";
 
-export function calculateGenerationPrice(usdRate: number) {
-  const {
-    model,
-    duration,
-    audio,
-  } = useGenerationStore.getState();
-
+export function calculateGenerationPrice(
+  model: string,
+  resolution: Resolution,
+  duration: number,
+  audio: boolean,
+  usdRate: number
+) {
   const selectedModel = SEEDANCE.models.find(
     (m) => m.id === model
   );
@@ -16,16 +16,22 @@ export function calculateGenerationPrice(usdRate: number) {
     return 0;
   }
 
-  let pricePerSecond = selectedModel.pricePerSecond;
+  let pricePerSecond = 0;
 
-  // Seedance 1.5 Pro
+  // Модели, где стоимость зависит от аудио
   if (
-    selectedModel.pricePerSecondWithAudio !== undefined &&
-    selectedModel.pricePerSecondWithoutAudio !== undefined
+    selectedModel.pricePerSecondWithAudio &&
+    selectedModel.pricePerSecondWithoutAudio
   ) {
     pricePerSecond = audio
-      ? selectedModel.pricePerSecondWithAudio
-      : selectedModel.pricePerSecondWithoutAudio;
+      ? selectedModel.pricePerSecondWithAudio[resolution] ?? 0
+      : selectedModel.pricePerSecondWithoutAudio[resolution] ?? 0;
+  }
+
+  // Остальные модели
+  else {
+    pricePerSecond =
+      selectedModel.pricePerSecond[resolution] ?? 0;
   }
 
   const usd = pricePerSecond * duration;

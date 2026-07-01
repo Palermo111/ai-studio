@@ -17,7 +17,7 @@ export default function ProviderSection() {
   );
 
   return (
-    <Section title="AI Provider">
+    <Section title="Нейросеть">
       <div className="relative">
         <Sparkles
           size={16}

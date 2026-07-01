@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowUp } from "lucide-react";
 
 import { useWorkspaceStore } from "@/store/workspaceStore";
@@ -20,6 +20,9 @@ export default function GenerateButton() {
 
   const prompt = useGenerationStore((state) => state.prompt);
   const model = useGenerationStore((state) => state.model);
+  const resolution = useGenerationStore(
+    (state) => state.resolution
+  );
   const duration = useGenerationStore((state) => state.duration);
   const audio = useGenerationStore((state) => state.audio);
 
@@ -29,9 +32,13 @@ export default function GenerateButton() {
     getUsdRate().then(setUsdRate);
   }, []);
 
-  const cost = useMemo(() => {
-    return calculateGenerationPrice(usdRate);
-  }, [usdRate]);
+  const cost = calculateGenerationPrice(
+    model,
+    resolution,
+    duration,
+    audio,
+    usdRate
+  );
 
   const isDisabled =
     status === "generating" || !prompt?.trim();
@@ -64,7 +71,6 @@ export default function GenerateButton() {
   return (
     <div className="flex shrink-0 items-center gap-4">
 
-      {/* COST */}
       <div className="text-right leading-tight">
         <div className="text-xs text-muted-foreground">
           Стоимость
@@ -75,7 +81,6 @@ export default function GenerateButton() {
         </div>
       </div>
 
-      {/* BUTTON */}
       <button
         type="button"
         onClick={handleGenerate}

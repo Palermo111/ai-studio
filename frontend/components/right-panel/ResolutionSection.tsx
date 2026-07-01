@@ -4,7 +4,10 @@ import Section from "./Section";
 import OptionGroup from "@/components/ui/OptionGroup";
 
 import { RESOLUTIONS } from "@/constants/resolutions";
-import { useGenerationStore } from "@/store/generationStore";
+import {
+  Resolution,
+  useGenerationStore,
+} from "@/store/generationStore";
 
 export default function ResolutionSection() {
   const resolution = useGenerationStore(
@@ -16,12 +19,12 @@ export default function ResolutionSection() {
   );
 
   return (
-    <Section title="Resolution">
+    <Section title="Разрешение">
       <OptionGroup
         value={resolution}
         options={RESOLUTIONS}
         onChange={(value) =>
-          setResolution(value as "480p" | "720p" | "1080p")
+          setResolution(value as Resolution)
         }
       />
     </Section>

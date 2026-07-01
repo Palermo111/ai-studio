@@ -1,15 +1,19 @@
 import { create } from "zustand";
 
 export type SeedanceModel =
-  | "bytedance/seedance-1.5-pro"
-  | "bytedance/seedance-2.0-fast"
-  | "bytedance/seedance-2.0";
+  "bytedance/seedance-2.0";
+
+export type Resolution =
+  | "480p"
+  | "720p"
+  | "1080p"
+  | "4K";
 
 interface GenerationStore {
   provider: string;
   model: SeedanceModel;
 
-  resolution: "480p" | "720p" | "1080p";
+  resolution: Resolution;
   aspectRatio: "16:9" | "9:16" | "1:1";
   duration: number;
   mode: "Mini" | "Fast" | "Pro";
@@ -21,7 +25,7 @@ interface GenerationStore {
   setModel: (model: SeedanceModel) => void;
 
   setResolution: (
-    resolution: "480p" | "720p" | "1080p"
+    resolution: Resolution
   ) => void;
 
   setAspectRatio: (
@@ -42,7 +46,6 @@ interface GenerationStore {
 export const useGenerationStore = create<GenerationStore>((set) => ({
   provider: "openrouter",
 
-  // Модель по умолчанию
   model: "bytedance/seedance-2.0",
 
   resolution: "1080p",

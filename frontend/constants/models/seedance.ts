@@ -5,11 +5,8 @@ export interface AIModel {
   features: string[];
 
   // Стоимость генерации (USD / секунда)
-  pricePerSecond: number;
-
-  // Только для моделей, где цена зависит от аудио
-  pricePerSecondWithAudio?: number;
-  pricePerSecondWithoutAudio?: number;
+  // Ключ = разрешение
+  pricePerSecond: Record<string, number>;
 }
 
 export interface AIModelHome {
@@ -41,51 +38,29 @@ export const SEEDANCE = {
 
   models: [
     {
-      id: "bytedance/seedance-1.5-pro",
-      name: "Seedance 1.5 Pro",
-      description:
-        "Высококачественная модель ByteDance с поддержкой генерации видео с аудио и без аудио.",
-      features: [
-        "Image → Video",
-        "Audio",
-        "720p / 1080p",
-        "Highest quality",
-      ],
-
-      // Цена зависит от наличия аудио
-      pricePerSecond: 0,
-      pricePerSecondWithAudio: 0.05184,
-      pricePerSecondWithoutAudio: 0.02592,
-    },
-
-    {
-      id: "bytedance/seedance-2.0-fast",
-      name: "Seedance 2.0 Fast",
-      description:
-        "Ускоренная версия Seedance 2.0. Оптимальный баланс между скоростью и стоимостью.",
-      features: [
-        "Image → Video",
-        "720p / 1080p",
-        "Fast generation",
-      ],
-
-      pricePerSecond: 0.121,
-    },
-
-    {
       id: "bytedance/seedance-2.0",
+
       name: "Seedance 2.0",
+
       description:
         "Флагманская модель ByteDance для создания видео максимального качества.",
+
       features: [
         "Image → Video",
         "Audio",
         "Reference Images",
-        "720p / 1080p",
+        "480p / 720p / 1080p / 4K",
         "Best quality",
       ],
 
-      pricePerSecond: 0.1512,
+      // Реальные тарифы,
+      // подтвержденные тестами через OpenRouter
+      pricePerSecond: {
+        "480p": 0.06725,
+        "720p": 0.15125,
+        "1080p": 0.34,
+        "4K": 1.36,
+      },
     },
   ] satisfies AIModel[],
 };

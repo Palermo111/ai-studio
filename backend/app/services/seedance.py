@@ -98,7 +98,11 @@ class SeedanceService:
 
         if frame_images:
             payload["frame_images"] = frame_images
-
+            
+        print("=" * 50)
+        print("MODEL:", request.model)
+        print(payload)
+        print("=" * 50)
         return payload
 
     def _wait_for_completion(self, polling_url: str) -> None:

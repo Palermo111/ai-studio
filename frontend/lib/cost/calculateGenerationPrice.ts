@@ -1,9 +1,10 @@
-import { SEEDANCE.models } from "@/constants/models/seedance";
+import { SEEDANCE } from "@/constants/models/seedance";
 
 const USD_TO_RUB = 75;
 
 export function calculateGenerationPrice(
   model: string,
+  resolution: string,
   duration: number,
   audio: boolean
 ) {
@@ -15,15 +16,19 @@ export function calculateGenerationPrice(
     return 0;
   }
 
-  let pricePerSecond = selectedModel.pricePerSecond;
+  let pricePerSecond = 0;
 
+  // Seedance 1.5 Pro
   if (
-    selectedModel.pricePerSecondWithAudio !== undefined &&
-    selectedModel.pricePerSecondWithoutAudio !== undefined
+    selectedModel.pricePerSecondWithAudio &&
+    selectedModel.pricePerSecondWithoutAudio
   ) {
     pricePerSecond = audio
-      ? selectedModel.pricePerSecondWithAudio
-      : selectedModel.pricePerSecondWithoutAudio;
+      ? selectedModel.pricePerSecondWithAudio[resolution] ?? 0
+      : selectedModel.pricePerSecondWithoutAudio[resolution] ?? 0;
+  } else {
+    pricePerSecond =
+      selectedModel.pricePerSecond[resolution] ?? 0;
   }
 
   const priceUsd = pricePerSecond * duration;
