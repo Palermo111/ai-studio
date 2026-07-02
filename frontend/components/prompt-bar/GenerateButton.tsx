@@ -9,10 +9,14 @@ import { useGenerationStore } from "@/store/generationStore";
 import { calculateGenerationPrice } from "@/lib/cost/calculateCost";
 import { getUsdRate } from "@/lib/cost/getUsdRate";
 
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://162.248.164.246:8000";
+
 const DEV_MODE = true;
 
 const DEV_VIDEO =
-  "http://localhost:8000/storage/videos/seedance_20260701_143602.mp4";
+  `${API_URL}/storage/videos/seedance_20260701_143602.mp4`;
 
 export default function GenerateButton() {
   const status = useWorkspaceStore((state) => state.status);
@@ -55,12 +59,6 @@ export default function GenerateButton() {
 
   const isDisabled =
     status === "generating" || !prompt.trim();
-
-  console.log({
-    status,
-    prompt,
-    isDisabled,
-  });
 
   async function handleGenerate() {
     if (isDisabled) return;

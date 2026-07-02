@@ -1,3 +1,7 @@
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://162.248.164.246:8000";
+
 let cachedRate = 75;
 
 let lastUpdate = 0;
@@ -11,7 +15,11 @@ export async function getUsdRate() {
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/currency");
+    const response = await fetch(`${API_URL}/currency`);
+
+    if (!response.ok) {
+      throw new Error("Не удалось получить курс валют");
+    }
 
     const data = await response.json();
 

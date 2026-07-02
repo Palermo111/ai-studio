@@ -1,54 +1,52 @@
 export async function generateVideo(formData: FormData) {
-  const response = await fetch(
-    "http://localhost:8000/generate",
-    {
+  const API_URL =
+    process.env.NEXT_PUBLIC_API_URL ??
+    "http://162.248.164.246:8000";
+
+  export async function generateVideo(formData: FormData) {
+    const response = await fetch(`${API_URL}/generate`, {
       method: "POST",
       body: formData,
+    });
+
+    if (!response.ok) {
+      let message = "Неизвестная ошибка";
+
+      try {
+        const error = await response.json();
+        message = error.detail ?? message;
+      } catch {
+        // ничего не делаем
+      }
+
+      throw new Error(message);
     }
-  );
 
-  if (!response.ok) {
-    let message = "Неизвестная ошибка";
-
-    try {
-      const error = await response.json();
-
-      message = error.detail ?? message;
-    } catch {
-      // ничего не делаем
-    }
-
-    throw new Error(message);
+    return response.json();
   }
 
-  return response.json();
-}
+  export async function deleteVideo(
+    filename: string,
+    projectId?: number
+  ) {
+    const params = new URLSearchParams({
+      filename,
+    });
 
-export async function deleteVideo(
-  filename: string,
-  projectId?: number
-) {
-  const params = new URLSearchParams({
-    filename,
-  });
+    if (projectId !== undefined) {
+      params.append("projectId", String(projectId));
+    }
 
-  if (projectId !== undefined) {
-    params.append(
-      "projectId",
-      String(projectId)
+    const response = await fetch(
+      `${API_URL}/generate/video?${params.toString()}`,
+      {
+        method: "DELETE",
+      }
     );
-  }
 
-  const response = await fetch(
-    `http://localhost:8000/generate/video?${params.toString()}`,
-    {
-      method: "DELETE",
+    if (!response.ok) {
+      throw new Error("Не удалось удалить видео");
     }
-  );
 
-  if (!response.ok) {
-    throw new Error("Не удалось удалить видео");
+    return response.json();
   }
-
-  return response.json();
-}
