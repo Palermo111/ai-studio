@@ -49,6 +49,8 @@ export default function GeneratedVideoCard() {
   }
 
 async function handleDownload() {
+  if (!video) return;
+
   try {
     // Современные браузеры (Chrome, Edge)
     if ("showSaveFilePicker" in window) {
@@ -81,7 +83,6 @@ async function handleDownload() {
       return;
     }
 
-    // Старый способ (если браузер не поддерживает API)
     const link = document.createElement("a");
 
     link.href = video.path;
