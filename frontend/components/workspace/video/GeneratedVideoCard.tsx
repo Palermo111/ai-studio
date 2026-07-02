@@ -99,6 +99,17 @@ async function handleDownload() {
   }
 }
 
+async function handleDelete() {
+  if (!video || !activeProject) return;
+
+  try {
+    await deleteVideo(fileName, activeProject.id);
+    reset();
+  } catch (error) {
+    console.error(error);
+  }
+}
+
   return (
   <>
     
