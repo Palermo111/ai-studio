@@ -26,7 +26,7 @@ export default function AppShell({ children }: AppShellProps) {
         {/* Для страниц роутинга показываем children,
             для главной рабочей области — Workspace */}
         <div className="flex-1 overflow-hidden">
-          {children ?? <Workspace />}
+          <Workspace />
         </div>
 
         {/* PROMPT */}

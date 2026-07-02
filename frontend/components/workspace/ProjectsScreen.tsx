@@ -25,6 +25,7 @@ import DeleteProjectDialog from "@/components/dialogs/DeleteProjectDialog";
 
 
 export default function ProjectsScreen() {
+  console.log("PROJECTS SCREEN RENDER");
   const [projectName, setProjectName] = useState("");
 
   const [renameOpen, setRenameOpen] = useState(false);

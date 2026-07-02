@@ -9,6 +9,7 @@ import AudioView from "./AudioView";
 import ProjectsScreen from "./ProjectsScreen";
 
 export default function Workspace() {
+  console.log("WORKSPACE RENDER");
   const section = useWorkspaceStore((state) => state.section);
 
   const renderContent = () => {

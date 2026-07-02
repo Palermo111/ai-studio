@@ -11,6 +11,7 @@ import { useWorkspaceStore } from "@/store/workspaceStore";
 import GeneratedVideoCard from "./video/GeneratedVideoCard";
 
 export default function WorkspaceHome() {
+  console.log("WORKSPACE HOME RENDER");
   const activeProject = useProjectStore(
     (state) => state.activeProject
   );
