@@ -13,7 +13,7 @@ const API_URL =
   process.env.NEXT_PUBLIC_API_URL ??
   "http://162.248.164.246:8000";
 
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 const DEV_VIDEO =
   `${API_URL}/storage/videos/seedance_20260701_143602.mp4`;
