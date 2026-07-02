@@ -1,52 +1,51 @@
+const API_URL =
+  process.env.NEXT_PUBLIC_API_URL ??
+  "http://162.248.164.246:8000";
+
 export async function generateVideo(formData: FormData) {
-  const API_URL =
-    process.env.NEXT_PUBLIC_API_URL ??
-    "http://162.248.164.246:8000";
+  const response = await fetch(`${API_URL}/generate`, {
+    method: "POST",
+    body: formData,
+  });
 
-  export async function generateVideo(formData: FormData) {
-    const response = await fetch(`${API_URL}/generate`, {
-      method: "POST",
-      body: formData,
-    });
+  if (!response.ok) {
+    let message = "Неизвестная ошибка";
 
-    if (!response.ok) {
-      let message = "Неизвестная ошибка";
-
-      try {
-        const error = await response.json();
-        message = error.detail ?? message;
-      } catch {
-        // ничего не делаем
-      }
-
-      throw new Error(message);
+    try {
+      const error = await response.json();
+      message = error.detail ?? message;
+    } catch {
+      // ничего не делаем
     }
 
-    return response.json();
+    throw new Error(message);
   }
 
-  export async function deleteVideo(
-    filename: string,
-    projectId?: number
-  ) {
-    const params = new URLSearchParams({
-      filename,
-    });
+  return response.json();
+}
 
-    if (projectId !== undefined) {
-      params.append("projectId", String(projectId));
-    }
+export async function deleteVideo(
+  filename: string,
+  projectId?: number
+) {
+  const params = new URLSearchParams({
+    filename,
+  });
 
-    const response = await fetch(
-      `${API_URL}/generate/video?${params.toString()}`,
-      {
-        method: "DELETE",
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error("Не удалось удалить видео");
-    }
-
-    return response.json();
+  if (projectId !== undefined) {
+    params.append("projectId", String(projectId));
   }
+
+  const response = await fetch(
+    `${API_URL}/generate/video?${params.toString()}`,
+    {
+      method: "DELETE",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Не удалось удалить видео");
+  }
+
+  return response.json();
+}
