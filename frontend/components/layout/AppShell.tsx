@@ -1,11 +1,17 @@
 "use client";
 
+import { ReactNode } from "react";
+
 import Sidebar from "@/components/sidebar/Sidebar";
 import Workspace from "@/components/workspace/Workspace";
 import AIPanel from "@/components/right-panel/AIPanel";
 import PromptBar from "@/components/prompt-bar/PromptBar";
 
-export default function AppShell() {
+interface AppShellProps {
+  children?: ReactNode;
+}
+
+export default function AppShell({ children }: AppShellProps) {
   return (
     <div className="flex h-screen w-full bg-background text-foreground overflow-hidden">
 
@@ -17,12 +23,13 @@ export default function AppShell() {
       {/* CENTER */}
       <main className="relative flex flex-1 flex-col overflow-hidden">
 
-        {/* WORKSPACE */}
+        {/* Для страниц роутинга показываем children,
+            для главной рабочей области — Workspace */}
         <div className="flex-1 overflow-hidden">
-          <Workspace />
+          {children ?? <Workspace />}
         </div>
 
-        {/* PROMPT (overlay, НЕ влияет на центр) */}
+        {/* PROMPT */}
         <div className="shrink-0 border-t border-transparent">
           <PromptBar />
         </div>
