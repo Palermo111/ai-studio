@@ -1,10 +1,11 @@
 import { SEEDANCE } from "@/constants/models/seedance";
+import type { Resolution } from "@/store/generationStore";
 
 const USD_TO_RUB = 75;
 
 export function calculateGenerationPrice(
   model: string,
-  resolution: string,
+  resolution: Resolution,
   duration: number,
   audio: boolean
 ) {
