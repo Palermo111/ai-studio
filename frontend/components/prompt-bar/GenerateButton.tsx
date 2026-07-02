@@ -56,6 +56,12 @@ export default function GenerateButton() {
   const isDisabled =
     status === "generating" || !prompt.trim();
 
+  console.log({
+    status,
+    prompt,
+    isDisabled,
+  });
+
   async function handleGenerate() {
     if (isDisabled) return;
 
@@ -92,7 +98,6 @@ export default function GenerateButton() {
 
   return (
     <div className="flex shrink-0 items-center gap-4">
-
       <div className="text-right leading-tight">
         <div className="text-xs text-muted-foreground">
           Стоимость
@@ -139,7 +144,6 @@ export default function GenerateButton() {
           />
         )}
       </button>
-
     </div>
   );
 }
