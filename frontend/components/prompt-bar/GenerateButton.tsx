@@ -5,15 +5,23 @@ import { ArrowUp } from "lucide-react";
 
 import { useWorkspaceStore } from "@/store/workspaceStore";
 import { useGenerationStore } from "@/store/generationStore";
+import { useUploadStore } from "@/store/uploadStore";
 
 import { calculateGenerationPrice } from "@/lib/cost/calculateCost";
 import { getUsdRate } from "@/lib/cost/getUsdRate";
+
+import { buildFormData } from "@/lib/buildFormData";
+import { generateVideo } from "@/lib/api/generate";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ??
   "http://162.248.164.246:8000";
 
-const DEV_MODE = false;
+/**
+ * true  -> показываем тестовое видео
+ * false -> настоящая генерация через backend
+ */
+const DEV_MODE = true;
 
 const DEV_VIDEO =
   `${API_URL}/storage/videos/seedance_20260701_143602.mp4`;
@@ -26,21 +34,21 @@ export default function GenerateButton() {
 
   const prompt = useGenerationStore((state) => state.prompt);
   const model = useGenerationStore((state) => state.model);
-
   const resolution = useGenerationStore(
     (state) => state.resolution
   );
-
   const duration = useGenerationStore(
     (state) => state.duration
   );
-
   const audio = useGenerationStore(
     (state) => state.audio
   );
-
   const mode = useGenerationStore(
     (state) => state.mode
+  );
+
+  const clearFiles = useUploadStore(
+    (state) => state.clearFiles
   );
 
   const [usdRate, setUsdRate] = useState(75);
@@ -68,6 +76,10 @@ export default function GenerateButton() {
       setVideo(null);
       setStatus("generating");
 
+      /**
+       * DEV MODE
+       */
+
       if (DEV_MODE) {
         setVideo({
           path: DEV_VIDEO,
@@ -81,8 +93,25 @@ export default function GenerateButton() {
         return;
       }
 
-      // Здесь позже снова будет настоящая генерация
+      /**
+       * REAL GENERATION
+       */
 
+      const formData = buildFormData();
+
+      const result = await generateVideo(formData);
+
+      setVideo({
+        path: result.video_path,
+        resolution,
+        duration,
+        mode,
+        audio,
+      });
+
+      clearFiles();
+
+      setStatus("success");
     } catch (error) {
       setStatus("error");
 
