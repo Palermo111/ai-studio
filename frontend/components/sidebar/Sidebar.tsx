@@ -49,6 +49,7 @@ export default function Sidebar() {
 
         <button
           onClick={() => {
+            console.log("CLICK PROJECTS");
             setSection("projects");
           }}
           className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 transition ${

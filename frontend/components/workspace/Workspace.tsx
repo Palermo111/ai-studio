@@ -11,7 +11,7 @@ import ProjectsScreen from "./ProjectsScreen";
 export default function Workspace() {
   console.log("WORKSPACE RENDER");
   const section = useWorkspaceStore((state) => state.section);
-
+  console.log("SECTION =", section);
   const renderContent = () => {
     switch (section) {
       case "home":
@@ -33,7 +33,7 @@ export default function Workspace() {
         return <WorkspaceHome />;
     }
   };
-
+  
   return (
     <div className="flex h-full w-full items-center justify-center overflow-hidden px-10">
       <div className="w-full h-full flex items-center justify-center">
