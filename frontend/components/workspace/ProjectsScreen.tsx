@@ -19,14 +19,10 @@ import {
 
 import { useProjectStore } from "@/store/projectStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
-
+import type { Project } from "@/types/project";
 import RenameProjectDialog from "@/components/dialogs/RenameProjectDialog";
 import DeleteProjectDialog from "@/components/dialogs/DeleteProjectDialog";
 
-type Project = {
-  id: number;
-  name: string;
-};
 
 export default function ProjectsScreen() {
   const [projectName, setProjectName] = useState("");
