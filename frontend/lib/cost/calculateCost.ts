@@ -16,23 +16,8 @@ export function calculateGenerationPrice(
     return 0;
   }
 
-  let pricePerSecond = 0;
-
-  // Модели, где стоимость зависит от аудио
-  if (
-    selectedModel.pricePerSecondWithAudio &&
-    selectedModel.pricePerSecondWithoutAudio
-  ) {
-    pricePerSecond = audio
-      ? selectedModel.pricePerSecondWithAudio[resolution] ?? 0
-      : selectedModel.pricePerSecondWithoutAudio[resolution] ?? 0;
-  }
-
-  // Остальные модели
-  else {
-    pricePerSecond =
-      selectedModel.pricePerSecond[resolution] ?? 0;
-  }
+  const pricePerSecond =
+    selectedModel.pricePerSecond[resolution] ?? 0;
 
   const usd = pricePerSecond * duration;
 
