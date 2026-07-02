@@ -10,6 +10,12 @@ export default function AttachmentButton() {
 
   const addFiles = useUploadStore((state) => state.addFiles);
 
+  function createId() {
+    return `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2, 11)}`;
+  }
+
   function handleFiles(files: FileList | null) {
     if (!files) return;
 
@@ -40,7 +46,7 @@ export default function AttachmentButton() {
       }
 
       return {
-        id: crypto.randomUUID(),
+        id: createId(),
         file,
         preview:
           type === "image"
