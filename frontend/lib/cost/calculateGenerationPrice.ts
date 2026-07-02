@@ -16,20 +16,8 @@ export function calculateGenerationPrice(
     return 0;
   }
 
-  let pricePerSecond = 0;
-
-  // Seedance 1.5 Pro
-  if (
-    selectedModel.pricePerSecondWithAudio &&
-    selectedModel.pricePerSecondWithoutAudio
-  ) {
-    pricePerSecond = audio
-      ? selectedModel.pricePerSecondWithAudio[resolution] ?? 0
-      : selectedModel.pricePerSecondWithoutAudio[resolution] ?? 0;
-  } else {
-    pricePerSecond =
-      selectedModel.pricePerSecond[resolution] ?? 0;
-  }
+  const pricePerSecond =
+    selectedModel.pricePerSecond[resolution] ?? 0;
 
   const priceUsd = pricePerSecond * duration;
 
