@@ -10,7 +10,23 @@ CBR_URL = "https://www.cbr-xml-daily.ru/daily_json.js"
 
 
 class CurrencyService:
+    def _ensure_file(self):
+        CURRENCY_PATH.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
+        if not CURRENCY_PATH.exists():
+            self._save(
+                {
+                    "usd_to_rub": 80,
+                    "last_currency_update": "2000-01-01",
+                }
+            )
+
     def _load(self) -> dict:
+        self._ensure_file()
+
         with open(
             CURRENCY_PATH,
             "r",
@@ -19,6 +35,11 @@ class CurrencyService:
             return json.load(f)
 
     def _save(self, data: dict):
+        CURRENCY_PATH.parent.mkdir(
+            parents=True,
+            exist_ok=True,
+        )
+
         with open(
             CURRENCY_PATH,
             "w",
