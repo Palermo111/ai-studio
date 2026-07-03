@@ -1,7 +1,7 @@
 from pathlib import Path
 from uuid import uuid4
 import os
-
+import traceback
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 from app.config import BASE_URL
@@ -112,11 +112,9 @@ async def generate_video(
             detail=str(e),
         )
 
-    except Exception as e:
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        )
+    except Exception:
+        traceback.print_exc()
+        raise
 
 
 @router.delete("/video")
