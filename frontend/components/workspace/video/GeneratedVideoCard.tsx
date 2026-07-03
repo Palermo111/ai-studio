@@ -49,18 +49,14 @@ export default function GeneratedVideoCard() {
   }
 
 async function handleDownload() {
+  console.log("DOWNLOAD CLICK");
+  console.log("showSaveFilePicker =", "showSaveFilePicker" in window);
   if (!video) return;
 
   try {
-    // Современные браузеры (Chrome, Edge)
+    // Chrome / Edge
     if ("showSaveFilePicker" in window) {
-      const response = await fetch(video.path);
-
-      if (!response.ok) {
-        throw new Error("Не удалось скачать видео");
-      }
-
-      const blob = await response.blob();
+      console.log("OPEN FILE PICKER");
 
       // @ts-ignore
       const handle = await window.showSaveFilePicker({
@@ -75,6 +71,14 @@ async function handleDownload() {
         ],
       });
 
+      const response = await fetch(video.path);
+
+      if (!response.ok) {
+        throw new Error("Не удалось скачать видео");
+      }
+
+      const blob = await response.blob();
+
       const writable = await handle.createWritable();
 
       await writable.write(blob);
@@ -83,6 +87,7 @@ async function handleDownload() {
       return;
     }
 
+    // Firefox / Safari
     const link = document.createElement("a");
 
     link.href = video.path;

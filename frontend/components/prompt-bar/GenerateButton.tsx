@@ -21,10 +21,10 @@ const API_URL =
  * true  -> показываем тестовое видео
  * false -> настоящая генерация через backend
  */
-const DEV_MODE = false;
+const DEV_MODE = true;
 
 const DEV_VIDEO =
-  `${API_URL}/storage/videos/seedance_20260701_143602.mp4`;
+  `${API_URL}/storage/videos/seedance_20260703_102749.mp4`;
 
 export default function GenerateButton() {
   const status = useWorkspaceStore((state) => state.status);
@@ -69,6 +69,7 @@ export default function GenerateButton() {
     status === "generating" || !prompt.trim();
 
   async function handleGenerate() {
+    console.log("DEV_MODE =", DEV_MODE);
     if (isDisabled) return;
 
     try {
@@ -81,6 +82,7 @@ export default function GenerateButton() {
        */
 
       if (DEV_MODE) {
+        console.log("TEST VIDEO");
         setVideo({
           path: DEV_VIDEO,
           resolution,
