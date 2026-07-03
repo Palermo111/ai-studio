@@ -105,10 +105,16 @@ async function handleDownload() {
 }
 
 async function handleDelete() {
-  if (!video || !activeProject) return;
+  console.log("DELETE");
+  console.log(activeProject);
+  if (!video) return;
 
   try {
-    await deleteVideo(fileName, activeProject.id);
+    await deleteVideo(
+      fileName,
+      activeProject?.id
+    );
+
     reset();
   } catch (error) {
     console.error(error);

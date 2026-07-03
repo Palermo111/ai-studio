@@ -15,7 +15,7 @@ import { generateVideo } from "@/lib/api/generate";
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ??
-  "http://162.248.164.246:8000";
+  "";
 
 /**
  * true  -> показываем тестовое видео
@@ -24,7 +24,7 @@ const API_URL =
 const DEV_MODE = true;
 
 const DEV_VIDEO =
-  `${API_URL}/storage/videos/seedance_20260703_102749.mp4`;
+  `${API_URL}/storage/videos/seedance_20260703_112114.mp4`;
 
 export default function GenerateButton() {
   const status = useWorkspaceStore((state) => state.status);

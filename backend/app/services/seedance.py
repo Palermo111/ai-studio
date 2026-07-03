@@ -196,5 +196,4 @@ class SeedanceService:
         return path
 
     def _build_public_url(self, path: str) -> str:
-        path = path.replace("\\", "/")
-        return f"{BASE_URL}/{path}"
+        return "/" + path.replace("\\", "/")

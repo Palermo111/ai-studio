@@ -1,6 +1,6 @@
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ??
-  "http://162.248.164.246:8000";
+  "";
 
 let cachedRate = 75;
 
@@ -9,7 +9,6 @@ let lastUpdate = 0;
 export async function getUsdRate() {
   const now = Date.now();
 
-  // обновляем максимум раз в 5 минут
   if (now - lastUpdate < 5 * 60 * 1000) {
     return cachedRate;
   }

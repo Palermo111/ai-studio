@@ -1,6 +1,6 @@
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL ??
-  "http://162.248.164.246:8000";
+  "";
 
 export async function generateVideo(formData: FormData) {
   const response = await fetch(`${API_URL}/generate`, {
@@ -14,9 +14,7 @@ export async function generateVideo(formData: FormData) {
     try {
       const error = await response.json();
       message = error.detail ?? message;
-    } catch {
-      // ничего не делаем
-    }
+    } catch {}
 
     throw new Error(message);
   }
