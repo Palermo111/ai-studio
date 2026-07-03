@@ -14,20 +14,34 @@ class SeedanceService:
         self.history = HistoryService()
 
     def generate(self, request: VideoRequest) -> str:
+        print("=== SUBMIT ===")
+
         job = self._submit_job(request)
+        print("JOB =", job)
+
+        print(job)
+
+        print("=== WAIT ===")
 
         self._wait_for_completion(job["polling_url"])
 
+        print("=== DOWNLOAD ===")
+
         video_bytes = self._download_video(job["id"])
 
+        print(f"Downloaded {len(video_bytes)} bytes")
+
         output_dir = self._get_output_dir(request)
+
+        print("Output dir:", output_dir)
 
         video_path = self._save_video(
             video_bytes=video_bytes,
             output_dir=output_dir,
         )
 
-        # В историю сохраняем путь на диске
+        print("Saved:", video_path)
+
         self.history.add(
             prompt=request.prompt,
             model=request.model,
@@ -37,8 +51,11 @@ class SeedanceService:
             video_path=video_path,
         )
 
-        # А фронтенду возвращаем публичный URL
-        return self._build_public_url(video_path)
+        public_url = self._build_public_url(video_path)
+
+        print("Public URL:", public_url)
+
+        return public_url
 
     def delete_video(
         self,

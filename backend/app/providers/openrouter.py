@@ -55,6 +55,11 @@ class OpenRouterClient:
 
             self._check_response(response)
 
+            print("=" * 80)
+            print("OPENROUTER RESPONSE:")
+            print(response.json())
+            print("=" * 80)
+
             return response.json()
 
         except httpx.ConnectError as e:
