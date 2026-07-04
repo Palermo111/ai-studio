@@ -21,7 +21,7 @@ const API_URL =
  * true  -> показываем тестовое видео
  * false -> настоящая генерация через backend
  */
-const DEV_MODE = true;
+const DEV_MODE = false;
 
 const DEV_VIDEO =
   `${API_URL}/storage/videos/seedance_20260703_112114.mp4`;

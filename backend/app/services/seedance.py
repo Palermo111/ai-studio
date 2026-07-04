@@ -17,6 +17,9 @@ class SeedanceService:
         print("=== SUBMIT ===")
 
         job = self._submit_job(request)
+
+        if job.get("error"):
+            raise OpenRouterError(job["error"]["message"])
         print("JOB =", job)
 
         print(job)

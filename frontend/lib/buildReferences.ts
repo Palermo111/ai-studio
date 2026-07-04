@@ -16,13 +16,37 @@ export function buildReferences(
   // Убираем дубликаты
   const aliases = [...new Set(matches)];
 
-  // Находим соответствующие файлы
+  // ---------------------------------------
+  // Image-to-Video
+  //
+  // Если нет ни одного @image,
+  // но загружена ровно одна картинка —
+  // считаем это Image-to-Video.
+  // ---------------------------------------
+
+  if (aliases.length === 0 && files.length === 1) {
+    return [
+      {
+        alias: files[0].alias,
+        file: files[0],
+      },
+    ];
+  }
+
+  // ---------------------------------------
+  // Reference Images
+  // ---------------------------------------
+
   return aliases
     .map((alias) => {
-      const file = files.find((f) => f.alias === alias);
+      const file = files.find(
+        (f) => f.alias === alias
+      );
 
       if (!file) {
-        console.warn(`Reference not found: ${alias}`);
+        console.warn(
+          `Reference not found: ${alias}`
+        );
         return null;
       }
 
@@ -34,6 +58,7 @@ export function buildReferences(
     .filter(
       (
         reference
-      ): reference is PromptReference => reference !== null
+      ): reference is PromptReference =>
+        reference !== null
     );
 }

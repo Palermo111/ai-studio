@@ -47,6 +47,11 @@ class OpenRouterClient:
     def post(self, endpoint: str, data: dict) -> dict:
         try:
             with httpx.Client(timeout=300) as client:
+                import json
+
+                print("=" * 80)
+                print(json.dumps(data, indent=2, ensure_ascii=False))
+                print("=" * 80)
                 response = client.post(
                     f"{self.base_url}/{endpoint}",
                     headers=self.headers,
