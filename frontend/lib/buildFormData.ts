@@ -39,12 +39,37 @@ export function buildFormData() {
     );
   }
 
-  // Находим только используемые в промпте референсы
+  // --------------------------------------------------
+  // Собираем все изображения для отправки
+  // --------------------------------------------------
+
   const references = buildReferences(
     payload.prompt,
     payload.files
   );
 
+  // Добавляем изображения, выбранные как Keyframes,
+  // даже если они отсутствуют в тексте промпта.
+  [payload.startFrameAlias, payload.endFrameAlias]
+    .filter(
+      (alias): alias is string => Boolean(alias)
+    )
+    .forEach((alias) => {
+      if (!references.some((r) => r.alias === alias)) {
+        const file = payload.files.find(
+          (f) => f.alias === alias
+        );
+
+        if (file) {
+          references.push({
+            alias,
+            file,
+          });
+        }
+      }
+    });
+
+  // Отправляем все необходимые изображения
   references.forEach((reference) => {
     formData.append("files", reference.file.file);
     formData.append("aliases", reference.alias);

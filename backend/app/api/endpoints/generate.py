@@ -46,6 +46,13 @@ async def generate_video(
         reference_images = []
         references: dict[str, str] = {}
 
+        print("=" * 80)
+        print("FILES:", len(files))
+        print("ALIASES:", aliases)
+        print("START ALIAS:", startFrameAlias)
+        print("END ALIAS:", endFrameAlias)
+        print("=" * 80)
+
         for index, file in enumerate(files):
             filename = f"{uuid4().hex}_{file.filename}"
 
@@ -82,6 +89,12 @@ async def generate_video(
             if endFrameAlias
             else None
         )
+
+        print("=" * 80)
+        print("REFERENCES:", references)
+        print("START URL:", start_frame_url)
+        print("END URL:", end_frame_url)
+        print("=" * 80)
 
         request = VideoRequest(
             prompt=parsed_prompt,

@@ -52,11 +52,31 @@ class OpenRouterClient:
                 print("=" * 80)
                 print(json.dumps(data, indent=2, ensure_ascii=False))
                 print("=" * 80)
-                response = client.post(
+
+                request = client.build_request(
+                    "POST",
                     f"{self.base_url}/{endpoint}",
                     headers=self.headers,
                     json=data,
                 )
+
+                print("=" * 80)
+                print("RAW HTTP REQUEST")
+                print(request.method)
+                print(request.url)
+                print(dict(request.headers))
+                print(request.content.decode())
+                print("=" * 80)
+
+                response = client.send(request)
+
+                print("=" * 80)
+                print("RAW HTTP RESPONSE")
+                print("STATUS:", response.status_code)
+                print("HEADERS:", response.headers)
+                print("BODY:")
+                print(response.text)
+                print("=" * 80)
 
             self._check_response(response)
 
