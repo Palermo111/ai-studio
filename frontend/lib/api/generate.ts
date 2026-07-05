@@ -5,6 +5,7 @@ const API_URL =
 export async function generateVideo(formData: FormData) {
   const response = await fetch(`${API_URL}/generate`, {
     method: "POST",
+    credentials: "include",
     body: formData,
   });
 
@@ -38,6 +39,7 @@ export async function deleteVideo(
     `${API_URL}/generate/video?${params.toString()}`,
     {
       method: "DELETE",
+      credentials: "include",
     }
   );
 
