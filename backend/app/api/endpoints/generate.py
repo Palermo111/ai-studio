@@ -1,7 +1,7 @@
 from pathlib import Path
 from uuid import uuid4
-import os
 import traceback
+
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
 
 from app.config import BASE_URL
@@ -36,7 +36,6 @@ async def generate_video(
     files: list[UploadFile] = File(default=[]),
     aliases: list[str] = Form(default=[]),
 
-    # Keyframes
     startFrameAlias: str | None = Form(None),
     endFrameAlias: str | None = Form(None),
 
@@ -49,14 +48,38 @@ async def generate_video(
         print("=" * 80)
         print("FILES:", len(files))
         print("ALIASES:", aliases)
-        print("START ALIAS:", startFrameAlias)
-        print("END ALIAS:", endFrameAlias)
+        print("PROJECT:", projectId)
         print("=" * 80)
 
         for index, file in enumerate(files):
             filename = f"{uuid4().hex}_{file.filename}"
 
-            save_path = Path("storage") / filename
+            # -----------------------------------------
+            # Куда сохраняем изображение
+            # -----------------------------------------
+
+            if projectId is None:
+                save_path = (
+                    Path("storage")
+                    / "images"
+                    / filename
+                )
+
+                image_url = (
+                    f"{BASE_URL}/storage/images/{filename}"
+                )
+
+            else:
+                save_path = (
+                    Path("projects")
+                    / str(projectId)
+                    / "images"
+                    / filename
+                )
+
+                image_url = (
+                    f"{BASE_URL}/project-storage/{projectId}/images/{filename}"
+                )
 
             save_path.parent.mkdir(
                 parents=True,
@@ -65,8 +88,6 @@ async def generate_video(
 
             with open(save_path, "wb") as buffer:
                 buffer.write(await file.read())
-
-            image_url = f"{BASE_URL}/storage/{filename}"
 
             reference_images.append(image_url)
 
@@ -107,7 +128,6 @@ async def generate_video(
             reference_images=reference_images,
             image_to_video=len(reference_images) > 0,
             project_id=projectId,
-
             start_frame_url=start_frame_url,
             end_frame_url=end_frame_url,
         )

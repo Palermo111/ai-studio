@@ -10,6 +10,8 @@ from app.api.endpoints.projects import router as projects_router
 
 router = APIRouter()
 
+
+# AI
 router.include_router(generate_router)
 router.include_router(history_router)
 router.include_router(models_router)

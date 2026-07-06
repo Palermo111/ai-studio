@@ -6,6 +6,7 @@ from app.config import BASE_URL, POLL_INTERVAL
 from app.database.history_service import HistoryService
 from app.providers.openrouter import OpenRouterClient
 from app.schemas.video_request import VideoRequest
+from app.exceptions import OpenRouterError
 
 
 class SeedanceService:
@@ -199,4 +200,13 @@ class SeedanceService:
         return path
 
     def _build_public_url(self, path: str) -> str:
-        return "/" + path.replace("\\", "/")
+        public_path = path.replace("\\", "/")
+
+        if public_path.startswith("projects/"):
+            public_path = public_path.replace(
+                "projects/",
+                "project-storage/",
+                1,
+            )
+
+        return "/" + public_path

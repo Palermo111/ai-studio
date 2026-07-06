@@ -17,3 +17,9 @@ BASE_URL = os.getenv(
     "BASE_URL",
     "http://localhost:8000",
 )
+
+# Секретный ключ для доступа к API
+API_SECRET = os.getenv(
+    "API_SECRET",
+    "",
+)
