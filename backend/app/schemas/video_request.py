@@ -23,19 +23,26 @@ class VideoRequest:
 
     aspect_ratio: str = DEFAULT_ASPECT_RATIO
 
+    # Atlas
     generate_audio: bool = False
+    cfg_scale: float = 0.5
+    negative_prompt: str = ""
 
-    reference_images: list[str] = field(default_factory=list)
-
-    image_to_video: bool = False
+    # Reference images
+    reference_image_paths: list[str] = field(default_factory=list)
+    reference_image_urls: list[str] = field(default_factory=list)
 
     output_dir: str = DEFAULT_OUTPUT_DIR
 
     # Если None — сохраняем в storage/videos
-    # Если указано имя проекта —
+    # Если указан project_id —
     # сохраняем в projects/<project>/videos
     project_id: int | None = None
 
-    # Keyframes
+    # Первый кадр
+    start_frame_path: str | None = None
     start_frame_url: str | None = None
+
+    # Последний кадр
+    end_frame_path: str | None = None
     end_frame_url: str | None = None

@@ -2,14 +2,21 @@ import os
 import time
 from datetime import datetime
 
+from app.services.video.payloads.seedance import SeedancePayload
 from app.config import BASE_URL, POLL_INTERVAL
 from app.database.history_service import HistoryService
 from app.providers.openrouter import OpenRouterClient
 from app.schemas.video_request import VideoRequest
 from app.exceptions import OpenRouterError
+from app.schemas.models import (
+    SEEDANCE_20,
+    KLING_V3,
+)
+
+from app.services.video.payloads.kling import KlingPayload
 
 
-class SeedanceService:
+class VideoService:
     def __init__(self):
         self.client = OpenRouterClient()
         self.history = HistoryService()
@@ -78,71 +85,40 @@ class SeedanceService:
         if os.path.exists(path):
             os.remove(path)
 
-    def _submit_job(self, request: VideoRequest) -> dict:
-        payload = self._build_payload(request)
+    def _submit_job(
+        self,
+        request: VideoRequest,
+    ) -> dict:
 
-        return self.client.post("videos", payload)
+        if request.model == KLING_V3:
+            payload = KlingPayload.build(request)
 
-    def _build_payload(self, request: VideoRequest) -> dict:
-        payload = {
-            "model": request.model,
-            "prompt": request.prompt,
-            "duration": request.duration,
-            "resolution": request.resolution,
-            "aspect_ratio": request.aspect_ratio,
-            "generate_audio": request.generate_audio,
-        }
-
-        frame_images = []
-
-        # Первый кадр
-        if request.start_frame_url:
-            frame_images.append(
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": request.start_frame_url,
-                    },
-                    "frame_type": "first_frame",
-                }
-            )
-
-        # Последний кадр
-        if request.end_frame_url:
-            frame_images.append(
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": request.end_frame_url,
-                    },
-                    "frame_type": "last_frame",
-                }
-            )
-
-        # Старый режим Image-to-Video
-        if (
-            not frame_images
-            and request.reference_images
-        ):
-            frame_images.append(
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": request.reference_images[0],
-                    },
-                    "frame_type": "first_frame",
-                }
-            )
-
-        if frame_images:
-            payload["frame_images"] = frame_images
+        else:
+            payload = SeedancePayload.build(request)
 
         print("=" * 50)
         print("MODEL:", request.model)
-        print(payload)
+        import json
+
+        print("=" * 80)
+        print("REQUEST TO OPENROUTER")
+        print(json.dumps(payload, indent=2, ensure_ascii=False))
+        print("=" * 80)
+
         print("=" * 50)
 
-        return payload
+        response = self.client.post(
+            "videos",
+            payload,
+        )
+
+        print("=" * 80)
+        print("OPENROUTER RESPONSE")
+        print(json.dumps(response, indent=2, ensure_ascii=False))
+        print("=" * 80)
+
+        return response
+
 
     def _wait_for_completion(self, polling_url: str) -> None:
         while True:

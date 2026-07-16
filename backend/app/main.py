@@ -1,5 +1,5 @@
 from app.schemas.video_request import VideoRequest
-from app.services.seedance import SeedanceService
+from app.services.video.video_service import VideoService
 
 
 def main():
@@ -14,7 +14,7 @@ def main():
         prompt=prompt,
     )
 
-    service = SeedanceService()
+    service = VideoService()
 
     video_path = service.generate(request)
 

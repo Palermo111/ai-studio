@@ -2,7 +2,7 @@
 
 import { RefObject } from "react";
 import { Music, Video, X } from "lucide-react";
-
+import { useCurrentModel } from "@/lib/model/useCurrentModel";
 import { useUploadStore } from "@/store/uploadStore";
 import { useGenerationStore } from "@/store/generationStore";
 
@@ -35,6 +35,12 @@ export default function UploadPreview({
 
   const prompt = useGenerationStore((state) => state.prompt);
   const setPrompt = useGenerationStore((state) => state.setPrompt);
+
+  const model = useCurrentModel();
+
+  const keyframesSupported =
+    model?.capabilities.firstFrame &&
+    model?.capabilities.lastFrame;
 
   function insertAlias(alias: string) {
     const textarea = textareaRef.current;
@@ -77,7 +83,6 @@ export default function UploadPreview({
   return (
     <div
       style={{
-        borderBottom: "1px solid #F2ECE5",
         padding: "0 16px 12px",
       }}
     >
@@ -150,7 +155,8 @@ export default function UploadPreview({
                       />
                     </div>
 
-                    {files.length === 2 && (
+                    {keyframesSupported &&
+                      files.length === 2 && (
                       <>
                         {/* START */}
                         <button
@@ -217,7 +223,8 @@ export default function UploadPreview({
                     )}
                   </div>
 
-                  {files.length === 2 && (
+                  {keyframesSupported &&
+                    files.length === 2 && (
                     <div
                       style={{
                         height: 18,

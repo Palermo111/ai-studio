@@ -1,7 +1,12 @@
 import { create } from "zustand";
 
-export type SeedanceModel =
-  "bytedance/seedance-2.0";
+export type VideoProvider =
+  | "seedance"
+  | "kling";
+
+export type VideoModel =
+  | "seedance-2.0"
+  | "kling-v3";
 
 export type Resolution =
   | "480p"
@@ -10,8 +15,9 @@ export type Resolution =
   | "4K";
 
 interface GenerationStore {
-  provider: string;
-  model: SeedanceModel;
+  provider: VideoProvider;
+
+  model: VideoModel;
 
   resolution: Resolution;
   aspectRatio: "16:9" | "9:16" | "1:1";
@@ -21,8 +27,13 @@ interface GenerationStore {
 
   prompt: string;
 
-  setProvider: (provider: string) => void;
-  setModel: (model: SeedanceModel) => void;
+  setProvider: (
+    provider: VideoProvider
+  ) => void;
+
+  setModel: (
+    model: VideoModel
+  ) => void;
 
   setResolution: (
     resolution: Resolution
@@ -32,67 +43,74 @@ interface GenerationStore {
     aspectRatio: "16:9" | "9:16" | "1:1"
   ) => void;
 
-  setDuration: (duration: number) => void;
+  setDuration: (
+    duration: number
+  ) => void;
 
   setMode: (
     mode: "Mini" | "Fast" | "Pro"
   ) => void;
 
-  setAudio: (audio: boolean) => void;
+  setAudio: (
+    audio: boolean
+  ) => void;
 
-  setPrompt: (prompt: string) => void;
+  setPrompt: (
+    prompt: string
+  ) => void;
 }
 
-export const useGenerationStore = create<GenerationStore>((set) => ({
-  provider: "openrouter",
+export const useGenerationStore =
+  create<GenerationStore>((set) => ({
+    provider: "seedance",
 
-  model: "bytedance/seedance-2.0",
+    model: "seedance-2.0",
 
-  resolution: "480p",
-  aspectRatio: "9:16",
-  duration: 4,
-  mode: "Pro",
-  audio: true,
+    resolution: "480p",
+    aspectRatio: "9:16",
+    duration: 4,
+    mode: "Pro",
+    audio: true,
 
-  prompt: "",
+    prompt: "",
 
-  setProvider: (provider) =>
-    set({
-      provider,
-    }),
+    setProvider: (provider) =>
+      set({
+        provider,
+      }),
 
-  setModel: (model) =>
-    set({
-      model,
-    }),
+    setModel: (model) =>
+      set({
+        model,
+      }),
 
-  setResolution: (resolution) =>
-    set({
-      resolution,
-    }),
+    setResolution: (resolution) =>
+      set({
+        resolution,
+      }),
 
-  setAspectRatio: (aspectRatio) =>
-    set({
-      aspectRatio,
-    }),
+    setAspectRatio: (aspectRatio) =>
+      set({
+        aspectRatio,
+      }),
 
-  setDuration: (duration) =>
-    set({
-      duration,
-    }),
+    setDuration: (duration) =>
+      set({
+        duration,
+      }),
 
-  setMode: (mode) =>
-    set({
-      mode,
-    }),
+    setMode: (mode) =>
+      set({
+        mode,
+      }),
 
-  setAudio: (audio) =>
-    set({
-      audio,
-    }),
+    setAudio: (audio) =>
+      set({
+        audio,
+      }),
 
-  setPrompt: (prompt) =>
-    set({
-      prompt,
-    }),
-}));
+    setPrompt: (prompt) =>
+      set({
+        prompt,
+      }),
+  }));

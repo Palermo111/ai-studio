@@ -1,20 +1,7 @@
-export interface AIModel {
-  id: string;
-  name: string;
-  description: string;
-  features: string[];
-
-  // Стоимость генерации (USD / секунда)
-  // Ключ = разрешение
-  pricePerSecond: Record<string, number>;
-}
-
-export interface AIModelHome {
-  title: string;
-  subtitle: string;
-  description: string;
-  features: string[];
-}
+import {
+  AIModel,
+  AIModelHome,
+} from "./types";
 
 export const SEEDANCE = {
   home: {
@@ -38,7 +25,7 @@ export const SEEDANCE = {
 
   models: [
     {
-      id: "bytedance/seedance-2.0",
+      id: "seedance-2.0",
 
       name: "Seedance 2.0",
 
@@ -53,8 +40,36 @@ export const SEEDANCE = {
         "Best quality",
       ],
 
-      // Реальные тарифы,
-      // подтвержденные тестами через OpenRouter
+      capabilities: {
+        audio: true,
+
+        textToVideo: true,
+        imageToVideo: true,
+
+        firstFrame: true,
+        lastFrame: true,
+
+        maxReferenceImages: 6,
+
+        resolutions: [
+          "480p",
+          "720p",
+          "1080p",
+          "4K",
+        ],
+
+        durations: [
+          4, 5, 6, 7, 8, 9,
+          10, 11, 12, 13, 14, 15,
+        ],
+
+        aspectRatios: [
+          "16:9",
+          "9:16",
+          "1:1",
+        ],
+      },
+
       pricePerSecond: {
         "480p": 0.06725,
         "720p": 0.15125,

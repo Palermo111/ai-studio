@@ -1,12 +1,17 @@
 "use client";
 
+import { useEffect } from "react";
+
 import { Volume2, VolumeX } from "lucide-react";
 
 import Section from "./Section";
 
+import { useCurrentModel } from "@/lib/model/useCurrentModel";
 import { useGenerationStore } from "@/store/generationStore";
 
 export default function AudioSection() {
+  const model = useCurrentModel();
+
   const audio = useGenerationStore(
     (state) => state.audio
   );
@@ -14,6 +19,19 @@ export default function AudioSection() {
   const setAudio = useGenerationStore(
     (state) => state.setAudio
   );
+
+  const audioSupported =
+    model?.capabilities.audio ?? true;
+
+  useEffect(() => {
+    if (!audioSupported && audio) {
+      setAudio(false);
+    }
+  }, [
+    audioSupported,
+    audio,
+    setAudio,
+  ]);
 
   return (
     <Section title="Звук">
@@ -25,6 +43,7 @@ export default function AudioSection() {
 
         <button
           type="button"
+          disabled={!audioSupported}
           onClick={() => setAudio(!audio)}
           className={`
             flex
@@ -41,9 +60,26 @@ export default function AudioSection() {
             duration-200
 
             ${
-              audio
-                ? "border-primary bg-primary text-white"
-                : "border-border bg-background text-foreground hover:bg-muted"
+              !audioSupported
+                ? `
+                  cursor-not-allowed
+                  border-border
+                  bg-muted
+                  text-muted-foreground
+                  opacity-50
+                `
+                : audio
+                ? `
+                  border-primary
+                  bg-primary
+                  text-white
+                `
+                : `
+                  border-border
+                  bg-background
+                  text-foreground
+                  hover:bg-muted
+                `
             }
           `}
         >

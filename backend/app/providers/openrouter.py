@@ -2,7 +2,7 @@ import os
 
 import httpx
 from dotenv import load_dotenv
-
+from app.error_messages import ERROR_MESSAGES
 from app.exceptions import (
     DownloadError,
     InsufficientCreditsError,
@@ -163,10 +163,13 @@ class OpenRouterClient:
                 data = response.json()
 
                 if isinstance(data, dict):
-                    message = (
-                        data.get("error", {})
-                        .get("message")
-                    )
+                    error = data.get("error", {})
+
+                    message = error.get("message")
+                    code = error.get("code")
+
+                    if code in ERROR_MESSAGES:
+                        message = ERROR_MESSAGES[code]
 
                     if not message:
                         message = str(data)

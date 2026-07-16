@@ -2,15 +2,14 @@ from pathlib import Path
 from uuid import uuid4
 import traceback
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile
+from fastapi import APIRouter, File, Form, HTTPException, UploadFile
 
 from app.config import BASE_URL
-from app.core.dependencies import get_seedance_service
-from app.exceptions import OpenRouterError
+from app.exceptions import ProviderError
 from app.schemas.responses import GenerateResponse
 from app.schemas.video_request import VideoRequest
 from app.services.reference_parser import ReferenceParser
-from app.services.seedance import SeedanceService
+from app.services.video.factory import VideoFactory
 
 router = APIRouter(
     prefix="/generate",
@@ -38,12 +37,13 @@ async def generate_video(
 
     startFrameAlias: str | None = Form(None),
     endFrameAlias: str | None = Form(None),
-
-    service: SeedanceService = Depends(get_seedance_service),
 ):
     try:
-        reference_images = []
+        reference_image_paths: list[str] = []
+        reference_image_urls: list[str] = []
+
         references: dict[str, str] = {}
+        reference_paths: dict[str, str] = {}
 
         print("=" * 80)
         print("FILES:", len(files))
@@ -53,10 +53,6 @@ async def generate_video(
 
         for index, file in enumerate(files):
             filename = f"{uuid4().hex}_{file.filename}"
-
-            # -----------------------------------------
-            # Куда сохраняем изображение
-            # -----------------------------------------
 
             if projectId is None:
                 save_path = (
@@ -89,10 +85,17 @@ async def generate_video(
             with open(save_path, "wb") as buffer:
                 buffer.write(await file.read())
 
-            reference_images.append(image_url)
+            reference_image_paths.append(
+                str(save_path)
+            )
+
+            reference_image_urls.append(
+                image_url
+            )
 
             if index < len(aliases):
                 references[aliases[index]] = image_url
+                reference_paths[aliases[index]] = str(save_path)
 
         parsed_prompt = ReferenceParser.replace_prompt(
             prompt,
@@ -105,16 +108,31 @@ async def generate_video(
             else None
         )
 
+        start_frame_path = (
+            reference_paths.get(startFrameAlias)
+            if startFrameAlias
+            else None
+        )
+
         end_frame_url = (
             references.get(endFrameAlias)
             if endFrameAlias
             else None
         )
 
+        end_frame_path = (
+            reference_paths.get(endFrameAlias)
+            if endFrameAlias
+            else None
+        )
+
         print("=" * 80)
         print("REFERENCES:", references)
+        print("REFERENCE PATHS:", reference_paths)
         print("START URL:", start_frame_url)
+        print("START PATH:", start_frame_path)
         print("END URL:", end_frame_url)
+        print("END PATH:", end_frame_path)
         print("=" * 80)
 
         request = VideoRequest(
@@ -125,12 +143,20 @@ async def generate_video(
             resolution=resolution,
             aspect_ratio=aspectRatio,
             generate_audio=audio,
-            reference_images=reference_images,
-            image_to_video=len(reference_images) > 0,
+
+            reference_image_paths=reference_image_paths,
+            reference_image_urls=reference_image_urls,
+
             project_id=projectId,
+
+            start_frame_path=start_frame_path,
             start_frame_url=start_frame_url,
+
+            end_frame_path=end_frame_path,
             end_frame_url=end_frame_url,
         )
+
+        service = VideoFactory.create(request)
 
         video_path = service.generate(request)
 
@@ -139,7 +165,7 @@ async def generate_video(
             video_path=video_path,
         )
 
-    except OpenRouterError as e:
+    except ProviderError as e:
         raise HTTPException(
             status_code=400,
             detail=str(e),
@@ -154,15 +180,23 @@ async def generate_video(
 async def delete_video(
     filename: str,
     projectId: int | None = None,
-    service: SeedanceService = Depends(get_seedance_service),
 ):
     try:
+        request = VideoRequest(
+            prompt="",
+            project_id=projectId,
+        )
+
+        service = VideoFactory.create(request)
+
         service.delete_video(
             filename=filename,
             project_id=projectId,
         )
 
-        return {"success": True}
+        return {
+            "success": True,
+        }
 
     except Exception as e:
         raise HTTPException(

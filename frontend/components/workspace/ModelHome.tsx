@@ -2,11 +2,21 @@
 
 import { Sparkles } from "lucide-react";
 
-import { SEEDANCE } from "@/constants/models/seedance";
+import { VIDEO_PROVIDERS } from "@/constants/providers";
+import { useGenerationStore } from "@/store/generationStore";
 
 export default function ModelHome() {
-  const home = SEEDANCE.home;
+  const provider = useGenerationStore(
+    (state) => state.provider
+  );
 
+  const home =
+    VIDEO_PROVIDERS.find(
+      (item) => item.id === provider
+    )?.home ?? VIDEO_PROVIDERS[0].home;
+  
+  console.log("Provider:", provider);
+  console.log("Home:", home.title);
   return (
     <div className="flex h-full items-center justify-center px-10">
       <div className="w-full max-w-5xl text-center">
@@ -82,7 +92,6 @@ export default function ModelHome() {
         {/* Features */}
 
         <div className="mt-16">
-
           <p
             className="
               mb-8
@@ -104,7 +113,7 @@ export default function ModelHome() {
               gap-3
             "
           >
-            {home.features.map((feature) => (
+            {home.features.map((feature: string) => (
               <div
                 key={feature}
                 className="
@@ -125,7 +134,6 @@ export default function ModelHome() {
               </div>
             ))}
           </div>
-
         </div>
 
       </div>

@@ -1,0 +1,54 @@
+export type Resolution =
+  | "480p"
+  | "720p"
+  | "1080p"
+  | "4K";
+
+export type AspectRatio =
+  | "16:9"
+  | "9:16"
+  | "1:1";
+
+export interface ModelCapabilities {
+  audio: boolean;
+
+  textToVideo: boolean;
+  imageToVideo: boolean;
+
+  firstFrame: boolean;
+  lastFrame: boolean;
+
+  maxReferenceImages: number;
+
+  resolutions: Resolution[];
+
+  durations: number[];
+
+  aspectRatios: AspectRatio[];
+}
+
+export interface AIModel {
+  id: string;
+
+  name: string;
+
+  description: string;
+
+  features: string[];
+
+  capabilities: ModelCapabilities;
+
+  // Стоимость генерации (USD / секунда)
+  // Ключ = разрешение
+  pricePerSecond: Record<string, number>;
+}
+
+export interface AIModelHome {
+  title: string;
+
+  subtitle: string;
+
+  description: string;
+
+  features: string[];
+}

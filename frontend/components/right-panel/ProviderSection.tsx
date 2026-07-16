@@ -4,8 +4,11 @@ import { Sparkles } from "lucide-react";
 
 import Section from "./Section";
 
-import { AI_PROVIDERS } from "@/constants/ais";
-import { useGenerationStore } from "@/store/generationStore";
+import { VIDEO_PROVIDERS } from "@/constants/providers";
+import {
+  useGenerationStore,
+  type VideoProvider,
+} from "@/store/generationStore";
 
 export default function ProviderSection() {
   const provider = useGenerationStore(
@@ -14,6 +17,10 @@ export default function ProviderSection() {
 
   const setProvider = useGenerationStore(
     (state) => state.setProvider
+  );
+
+  const setModel = useGenerationStore(
+    (state) => state.setModel
   );
 
   return (
@@ -33,7 +40,26 @@ export default function ProviderSection() {
 
         <select
           value={provider}
-          onChange={(e) => setProvider(e.target.value)}
+          onChange={(e) => {
+            const providerId =
+              e.target.value as VideoProvider;
+
+            setProvider(providerId);
+
+            const selectedProvider =
+              VIDEO_PROVIDERS.find(
+                (item) => item.id === providerId
+              );
+
+            if (
+              selectedProvider &&
+              selectedProvider.models.length > 0
+            ) {
+              setModel(
+                selectedProvider.models[0].id as any
+              );
+            }
+          }}
           className="
             h-12
             w-full
@@ -56,7 +82,7 @@ export default function ProviderSection() {
             focus:ring-primary/10
           "
         >
-          {AI_PROVIDERS.map((item) => (
+          {VIDEO_PROVIDERS.map((item) => (
             <option
               key={item.id}
               value={item.id}

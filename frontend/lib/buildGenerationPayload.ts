@@ -8,7 +8,13 @@ export function buildGenerationPayload() {
   const project = useProjectStore.getState();
 
   return {
-    provider: generation.provider,
+    // Провайдер API
+    provider:
+      generation.model === "kling-v3"
+        ? "atlas"
+        : "openrouter",
+
+    // AI-модель
     model: generation.model,
 
     prompt: generation.prompt,

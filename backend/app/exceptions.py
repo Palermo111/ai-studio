@@ -2,25 +2,41 @@ class AIStudioError(Exception):
     """Базовое исключение AI Studio."""
 
 
-class OpenRouterError(AIStudioError):
-    """Общая ошибка OpenRouter."""
+# ======================================================
+# Provider Errors
+# ======================================================
+
+class ProviderError(AIStudioError):
+    """Базовая ошибка AI-провайдера."""
 
 
-class InsufficientCreditsError(OpenRouterError):
-    """Недостаточно средств на балансе OpenRouter."""
+class ProviderConnectionError(ProviderError):
+    """Не удалось подключиться к AI-провайдеру."""
 
 
-class GenerationFailedError(OpenRouterError):
-    """Ошибка генерации видео."""
+class InvalidResponseError(ProviderError):
+    """Провайдер вернул неожиданный ответ API."""
 
 
-class OpenRouterConnectionError(OpenRouterError):
-    """Не удалось подключиться к OpenRouter."""
+class InsufficientCreditsError(ProviderError):
+    """Недостаточно средств на балансе."""
 
 
-class DownloadError(OpenRouterError):
+class DownloadError(ProviderError):
     """Не удалось скачать готовое видео."""
 
 
-class InvalidResponseError(OpenRouterError):
-    """OpenRouter вернул неожиданный ответ API."""
+class GenerationFailedError(ProviderError):
+    """Ошибка генерации видео."""
+
+
+class SensitiveImageError(ProviderError):
+    """Запрос отклонен, потому что изображение содержит реального человека."""
+
+
+# ======================================================
+# Совместимость со старым кодом
+# ======================================================
+
+OpenRouterError = ProviderError
+OpenRouterConnectionError = ProviderConnectionError

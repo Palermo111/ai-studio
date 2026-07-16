@@ -1,12 +1,15 @@
 "use client";
 
+import { useEffect } from "react";
+
 import Section from "./Section";
+
+import { useCurrentModel } from "@/lib/model/useCurrentModel";
 import { useGenerationStore } from "@/store/generationStore";
 
-const MIN_DURATION = 4;
-const MAX_DURATION = 15;
-
 export default function DurationSection() {
+  const model = useCurrentModel();
+
   const duration = useGenerationStore(
     (state) => state.duration
   );
@@ -15,11 +18,26 @@ export default function DurationSection() {
     (state) => state.setDuration
   );
 
+  const durations =
+    model?.capabilities.durations ?? [4];
+
+  const minDuration = Math.min(...durations);
+  const maxDuration = Math.max(...durations);
+
+  useEffect(() => {
+    if (!durations.includes(duration)) {
+      setDuration(durations[0]);
+    }
+  }, [
+    durations,
+    duration,
+    setDuration,
+  ]);
+
   return (
     <Section title="Длительность">
       <div className="space-y-3">
 
-        {/* top row */}
         <div className="flex items-center justify-between">
           <span className="text-xs text-muted-foreground">
             Длительность видео
@@ -30,11 +48,10 @@ export default function DurationSection() {
           </div>
         </div>
 
-        {/* slider */}
         <input
           type="range"
-          min={MIN_DURATION}
-          max={MAX_DURATION}
+          min={minDuration}
+          max={maxDuration}
           step={1}
           value={duration}
           onChange={(e) =>
@@ -43,10 +60,9 @@ export default function DurationSection() {
           className="w-full cursor-pointer accent-primary"
         />
 
-        {/* min/max labels */}
         <div className="flex justify-between text-[10px] text-muted-foreground">
-          <span>{MIN_DURATION} сек</span>
-          <span>{MAX_DURATION} сек</span>
+          <span>{minDuration} сек</span>
+          <span>{maxDuration} сек</span>
         </div>
 
       </div>
