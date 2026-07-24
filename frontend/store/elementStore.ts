@@ -1,6 +1,10 @@
 import { create } from "zustand";
 
 import { Element } from "@/types/element";
+import {
+  ElementEditorData,
+} from "@/types/element-editor";
+
 import { useProjectStore } from "@/store/projectStore";
 
 import {
@@ -10,6 +14,65 @@ import {
   deleteElement,
 } from "@/services/elementsService";
 
+function buildFormData(
+  data: ElementEditorData
+): FormData {
+  const formData = new FormData();
+
+  formData.append(
+    "name",
+    data.name.trim()
+  );
+
+  formData.append(
+    "description",
+    data.description.trim()
+  );
+
+  if (data.removeMainReference) {
+    formData.append(
+      "remove_main_reference",
+      "true"
+    );
+  }
+
+  if (data.replaceReferences) {
+    formData.append(
+      "replace_references",
+      "true"
+    );
+  }
+
+  if (data.mainReference?.file) {
+    formData.append(
+      "main_reference",
+      data.mainReference.file
+    );
+  }
+
+  data.references
+    .filter((item) => item.file)
+    .forEach((item) => {
+      formData.append(
+        "references",
+        item.file!
+      );
+    });
+
+  return formData;
+}
+
+function revokeIfBlob(
+  url: string | null
+) {
+  if (
+    url &&
+    url.startsWith("blob:")
+  ) {
+    URL.revokeObjectURL(url);
+  }
+}
+
 interface ElementStore {
   elements: Element[];
 
@@ -18,12 +81,12 @@ interface ElementStore {
   loadElements: () => Promise<void>;
 
   addElement: (
-    formData: FormData
+    data: ElementEditorData
   ) => Promise<void>;
 
   updateElement: (
     elementId: string,
-    formData: FormData
+    data: ElementEditorData
   ) => Promise<void>;
 
   deleteElement: (
@@ -60,14 +123,48 @@ export const useElementStore =
     },
 
     async addElement(
-      formData
+      data
     ) {
       const project =
         useProjectStore.getState().activeProject;
 
       if (!project) {
+        const element: Element = {
+          id: crypto.randomUUID(),
+          name: data.name.trim(),
+          description:
+            data.description.trim(),
+          mainReference:
+            data.mainReference
+              ? data.mainReference.file
+                ? URL.createObjectURL(
+                    data.mainReference.file
+                  )
+                : data.mainReference.preview
+              : null,
+          references:
+            data.references.map(
+              (reference) =>
+                reference.file
+                  ? URL.createObjectURL(
+                      reference.file
+                    )
+                  : reference.preview
+            ),
+        };
+
+        set((state) => ({
+          elements: [
+            ...state.elements,
+            element,
+          ],
+        }));
+
         return;
       }
+
+      const formData =
+        buildFormData(data);
 
       const element =
         await createElement(
@@ -85,14 +182,76 @@ export const useElementStore =
 
     async updateElement(
       elementId,
-      formData
+      data
     ) {
       const project =
         useProjectStore.getState().activeProject;
 
       if (!project) {
+        set((state) => {
+          const elements =
+            state.elements.map(
+              (element) => {
+                if (
+                  element.id !==
+                  elementId
+                ) {
+                  return element;
+                }
+
+                revokeIfBlob(
+                  element.mainReference
+                );
+
+                element.references.forEach(
+                  revokeIfBlob
+                );
+
+                return {
+                  ...element,
+                  name:
+                    data.name.trim(),
+                  description:
+                    data.description.trim(),
+                  mainReference:
+                    data.mainReference
+                      ? data
+                          .mainReference
+                          .file
+                        ? URL.createObjectURL(
+                            data
+                              .mainReference
+                              .file
+                          )
+                        : data
+                            .mainReference
+                            .preview
+                      : null,
+                  references:
+                    data.references.map(
+                      (
+                        reference
+                      ) =>
+                        reference.file
+                          ? URL.createObjectURL(
+                              reference.file
+                            )
+                          : reference.preview
+                    ),
+                };
+              }
+            );
+
+          return {
+            elements,
+          };
+        });
+
         return;
       }
+
+      const formData =
+        buildFormData(data);
 
       const updated =
         await updateElement(
@@ -120,6 +279,34 @@ export const useElementStore =
         useProjectStore.getState().activeProject;
 
       if (!project) {
+        set((state) => {
+          const element =
+            state.elements.find(
+              (item) =>
+                item.id ===
+                elementId
+            );
+
+          if (element) {
+            revokeIfBlob(
+              element.mainReference
+            );
+
+            element.references.forEach(
+              revokeIfBlob
+            );
+          }
+
+          return {
+            elements:
+              state.elements.filter(
+                (item) =>
+                  item.id !==
+                  elementId
+              ),
+          };
+        });
+
         return;
       }
 
@@ -131,10 +318,10 @@ export const useElementStore =
       set((state) => ({
         elements:
           state.elements.filter(
-            (element) =>
-              element.id !==
+            (item) =>
+              item.id !==
               elementId
-          ),
+        ),
       }));
     },
 

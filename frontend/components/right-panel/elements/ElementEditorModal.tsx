@@ -6,7 +6,10 @@ import { X } from "lucide-react";
 import MainReferenceSection from "./MainReferenceSection";
 import ElementInfoSection from "./ElementInfoSection";
 
-import { LocalReference } from "@/types/element-editor";
+import {
+  LocalReference,
+  ElementEditorData,
+} from "@/types/element-editor";
 
 import { useElementStore } from "@/store/elementStore";
 
@@ -156,57 +159,22 @@ export default function ElementEditorModal({
       return;
     }
 
-    const formData = new FormData();
-
-    formData.append(
-      "name",
-      name.trim()
-    );
-
-    formData.append(
-      "description",
-      description.trim()
-    );
-
-    if (removeMainReference) {
-      formData.append(
-        "remove_main_reference",
-        "true"
-      );
-    }
-
-    if (replaceReferences) {
-      formData.append(
-        "replace_references",
-        "true"
-      );
-    }
-
-    if (mainReference?.file) {
-      formData.append(
-        "main_reference",
-        mainReference.file
-      );
-    }
-
-    references
-      .filter(
-        (reference) => reference.file
-      )
-      .forEach((reference) => {
-        formData.append(
-          "references",
-          reference.file!
-        );
-      });
+    const data: ElementEditorData = {
+      name: name.trim(),
+      description: description.trim(),
+      mainReference,
+      references,
+      removeMainReference,
+      replaceReferences,
+    };
 
     if (editingElement) {
       await updateElement(
         editingElement.id,
-        formData
+        data
       );
     } else {
-      await addElement(formData);
+      await addElement(data);
     }
 
     closeModal();
