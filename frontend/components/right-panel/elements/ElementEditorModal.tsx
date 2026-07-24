@@ -71,6 +71,16 @@ export default function ElementEditorModal({
   const [references, setReferences] =
     useState<LocalReference[]>([]);
 
+  const [
+    removeMainReference,
+    setRemoveMainReference,
+  ] = useState(false);
+
+  const [
+    replaceReferences,
+    setReplaceReferences,
+  ] = useState(false);
+
   useEffect(() => {
     if (open) {
       requestAnimationFrame(() =>
@@ -86,6 +96,9 @@ export default function ElementEditorModal({
       return;
     }
 
+    setRemoveMainReference(false);
+    setReplaceReferences(false);
+
     if (editingElement) {
       setName(editingElement.name);
 
@@ -93,13 +106,24 @@ export default function ElementEditorModal({
         editingElement.description
       );
 
-      // После получения элемента с backend
-      // сюда позже будут подставляться
-      // LocalReference из url.
+      setMainReference(
+        editingElement.mainReference
+          ? {
+              id: crypto.randomUUID(),
+              preview:
+                editingElement.mainReference,
+            }
+          : null
+      );
 
-      setMainReference(null);
-
-      setReferences([]);
+      setReferences(
+        editingElement.references.map(
+          (url) => ({
+            id: crypto.randomUUID(),
+            preview: url,
+          })
+        )
+      );
     } else {
       resetForm();
     }
@@ -113,6 +137,10 @@ export default function ElementEditorModal({
     setMainReference(null);
 
     setReferences([]);
+
+    setRemoveMainReference(false);
+
+    setReplaceReferences(false);
   };
 
   const closeModal = () => {
@@ -140,19 +168,37 @@ export default function ElementEditorModal({
       description.trim()
     );
 
-    if (mainReference) {
+    if (removeMainReference) {
+      formData.append(
+        "remove_main_reference",
+        "true"
+      );
+    }
+
+    if (replaceReferences) {
+      formData.append(
+        "replace_references",
+        "true"
+      );
+    }
+
+    if (mainReference?.file) {
       formData.append(
         "main_reference",
         mainReference.file
       );
     }
 
-    references.forEach((reference) => {
-      formData.append(
-        "references",
-        reference.file
-      );
-    });
+    references
+      .filter(
+        (reference) => reference.file
+      )
+      .forEach((reference) => {
+        formData.append(
+          "references",
+          reference.file!
+        );
+      });
 
     if (editingElement) {
       await updateElement(
@@ -234,12 +280,21 @@ export default function ElementEditorModal({
 
         <div className="px-8 py-8">
           <div className="flex gap-8">
-
             <MainReferenceSection
               file={mainReference}
-              onFileChange={
-                setMainReference
-              }
+              onFileChange={(value) => {
+                setMainReference(value);
+
+                if (value === null) {
+                  setRemoveMainReference(
+                    true
+                  );
+                } else if (value.file) {
+                  setRemoveMainReference(
+                    false
+                  );
+                }
+              }}
             />
 
             <ElementInfoSection
@@ -250,11 +305,15 @@ export default function ElementEditorModal({
               onDescriptionChange={
                 setDescription
               }
-              onReferencesChange={
-                setReferences
-              }
+              onReferencesChange={(
+                value
+              ) => {
+                setReferences(value);
+                setReplaceReferences(
+                  true
+                );
+              }}
             />
-
           </div>
         </div>
 

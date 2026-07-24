@@ -2,32 +2,51 @@ import { api } from "./api";
 
 import { Element } from "@/types/element";
 
+interface ElementResponse {
+  id: string;
+  name: string;
+  description: string;
+  main_reference: string | null;
+  references: string[];
+}
+
+function mapElement(
+  element: ElementResponse
+): Element {
+  return {
+    id: element.id,
+    name: element.name,
+    description: element.description,
+    mainReference:
+      element.main_reference,
+    references: element.references,
+  };
+}
+
 export async function getElements(
   projectId: number
 ): Promise<Element[]> {
-  const { data } = await api.get(
+  const { data } = await api.get<
+    ElementResponse[]
+  >(
     `/projects/${projectId}/elements`
   );
 
-  return data;
+  return data.map(mapElement);
 }
 
 export async function createElement(
   projectId: number,
   formData: FormData
 ): Promise<Element> {
-  const { data } = await api.post(
+  const { data } = await api.post<
+    ElementResponse
+  >(
     `/projects/${projectId}/elements`,
-    formData,
-    {
-      headers: {
-        "Content-Type":
-          "multipart/form-data",
-      },
-    }
+    formData
   );
 
-  return data;
+  return mapElement(data);
 }
 
 export async function updateElement(
@@ -35,18 +54,14 @@ export async function updateElement(
   elementId: string,
   formData: FormData
 ): Promise<Element> {
-  const { data } = await api.put(
+  const { data } = await api.put<
+    ElementResponse
+  >(
     `/projects/${projectId}/elements/${elementId}`,
-    formData,
-    {
-      headers: {
-        "Content-Type":
-          "multipart/form-data",
-      },
-    }
+    formData
   );
 
-  return data;
+  return mapElement(data);
 }
 
 export async function deleteElement(

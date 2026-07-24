@@ -112,6 +112,8 @@ def update_element(
     element_id: str,
     name: str = Form(...),
     description: str = Form(""),
+    remove_main_reference: bool = Form(False),
+    replace_references: bool = Form(False),
     main_reference: UploadFile | None = None,
     references: list[UploadFile] | None = None,
 ):
@@ -129,11 +131,22 @@ def update_element(
     element["name"] = name.strip()
     element["description"] = description.strip()
 
-    if main_reference is not None:
+    # Удаление главного изображения
+    if remove_main_reference:
         elements.delete_image(
             project_id,
             element.get("main_reference"),
         )
+
+        element["main_reference"] = None
+
+    # Замена главного изображения
+    if main_reference is not None:
+        if element.get("main_reference"):
+            elements.delete_image(
+                project_id,
+                element.get("main_reference"),
+            )
 
         element["main_reference"] = (
             elements.save_image(
@@ -142,7 +155,8 @@ def update_element(
             )
         )
 
-    if references is not None:
+    # Полная замена дополнительных изображений
+    if replace_references:
         for image in element.get(
             "references",
             [],
@@ -152,13 +166,16 @@ def update_element(
                 image,
             )
 
-        element["references"] = [
-            elements.save_image(
-                project_id,
-                image,
-            )
-            for image in references
-        ]
+        element["references"] = []
+
+        if references:
+            element["references"] = [
+                elements.save_image(
+                    project_id,
+                    image,
+                )
+                for image in references
+            ]
 
     elements.update(
         project_id,

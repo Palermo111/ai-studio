@@ -238,7 +238,7 @@ class ElementService:
 
         return (
             f"{BASE_URL}"
-            f"/projects/{project_id}"
+            f"/project-storage/{project_id}"
             f"/images/{filename}"
         )
 

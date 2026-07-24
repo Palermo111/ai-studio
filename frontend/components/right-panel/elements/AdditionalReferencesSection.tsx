@@ -36,7 +36,11 @@ export default function AdditionalReferencesSection({
     const previous =
       next[index];
 
-    if (previous) {
+    if (
+      previous?.preview.startsWith(
+        "blob:"
+      )
+    ) {
       URL.revokeObjectURL(
         previous.preview
       );
@@ -62,7 +66,11 @@ export default function AdditionalReferencesSection({
     const removed =
       next[index];
 
-    if (removed) {
+    if (
+      removed?.preview.startsWith(
+        "blob:"
+      )
+    ) {
       URL.revokeObjectURL(
         removed.preview
       );

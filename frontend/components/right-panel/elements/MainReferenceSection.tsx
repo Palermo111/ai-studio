@@ -56,7 +56,11 @@ export default function MainReferenceSection({
   ) => {
     event.stopPropagation();
 
-    if (file) {
+    if (
+      file?.preview.startsWith(
+        "blob:"
+      )
+    ) {
       URL.revokeObjectURL(
         file.preview
       );
