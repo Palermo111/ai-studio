@@ -60,6 +60,31 @@ class KlingPayload:
             )
 
         # --------------------------------------------------
+        # Multi Shot
+        # --------------------------------------------------
+
+        if request.multi_shot:
+
+            payload["multi_shot"] = True
+            payload["shot_type"] = "customize"
+
+            payload["multi_prompt"] = [
+                {
+                    "index": index + 1,
+                    "prompt": shot.prompt,
+                    "duration": shot.duration,
+                }
+                for index, shot in enumerate(
+                    request.multi_prompt
+                )
+            ]
+
+            if request.instructions.strip():
+                payload["prompt"] = (
+                    request.instructions
+                )
+
+        # --------------------------------------------------
         # Image → Video
         # --------------------------------------------------
 
@@ -73,6 +98,11 @@ class KlingPayload:
             elif request.reference_image_urls:
                 payload["image"] = (
                     request.reference_image_urls[0]
+                )
+
+            if request.kling_elements:
+                payload["elements"] = (
+                    request.kling_elements
                 )
 
             if request.end_frame_url:

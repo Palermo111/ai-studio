@@ -15,6 +15,25 @@ class SeedancePayload:
             "generate_audio": request.generate_audio,
         }
 
+        # --------------------------------------------------
+        # Reference Images (Reference-to-Video)
+        # --------------------------------------------------
+
+        if request.reference_image_urls:
+            payload["input_references"] = [
+                {
+                    "type": "image_url",
+                    "image_url": {
+                        "url": url,
+                    },
+                }
+                for url in request.reference_image_urls
+            ]
+
+        # --------------------------------------------------
+        # First / Last Frame (Image-to-Video)
+        # --------------------------------------------------
+
         frame_images = []
 
         if request.start_frame_url:
@@ -36,20 +55,6 @@ class SeedancePayload:
                         "url": request.end_frame_url,
                     },
                     "frame_type": "last_frame",
-                }
-            )
-
-        if (
-            not frame_images
-            and request.reference_image_urls
-        ):
-            frame_images.append(
-                {
-                    "type": "image_url",
-                    "image_url": {
-                        "url": request.reference_image_urls[0],
-                    },
-                    "frame_type": "first_frame",
                 }
             )
 

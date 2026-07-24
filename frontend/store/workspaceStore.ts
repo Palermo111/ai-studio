@@ -22,6 +22,18 @@ export interface GeneratedVideo {
   audio: boolean;
 }
 
+export interface SceneBuilderScene {
+  id: number;
+  shotType: string;
+  duration: number;
+  prompt: string;
+}
+
+export interface SceneBuilderData {
+  instructions: string;
+  scenes: SceneBuilderScene[];
+}
+
 interface WorkspaceState {
   section: WorkspaceSection;
 
@@ -31,50 +43,73 @@ interface WorkspaceState {
 
   error: string | null;
 
-  setSection: (section: WorkspaceSection) => void;
+  sceneBuilder: SceneBuilderData | null;
 
-  setStatus: (status: GenerationStatus) => void;
+  setSection: (
+    section: WorkspaceSection
+  ) => void;
 
-  setVideo: (video: GeneratedVideo | null) => void;
+  setStatus: (
+    status: GenerationStatus
+  ) => void;
 
-  setError: (error: string | null) => void;
+  setVideo: (
+    video: GeneratedVideo | null
+  ) => void;
+
+  setError: (
+    error: string | null
+  ) => void;
+
+  setSceneBuilder: (
+    data: SceneBuilderData | null
+  ) => void;
 
   reset: () => void;
 }
 
-export const useWorkspaceStore = create<WorkspaceState>((set) => ({
-  section: "home",
+export const useWorkspaceStore =
+  create<WorkspaceState>((set) => ({
+    section: "home",
 
-  status: "idle",
+    status: "idle",
 
-  video: null,
+    video: null,
 
-  error: null,
+    error: null,
 
-  setSection: (section) =>
-    set({
-      section,
-    }),
+    sceneBuilder: null,
 
-  setStatus: (status) =>
-    set({
-      status,
-    }),
+    setSection: (section) =>
+      set({
+        section,
+      }),
 
-  setVideo: (video) =>
-    set({
-      video,
-    }),
+    setStatus: (status) =>
+      set({
+        status,
+      }),
 
-  setError: (error) =>
-    set({
-      error,
-    }),
+    setVideo: (video) =>
+      set({
+        video,
+      }),
 
-  reset: () =>
-    set({
-      status: "idle",
-      video: null,
-      error: null,
-    }),
-}));
+    setError: (error) =>
+      set({
+        error,
+      }),
+
+    setSceneBuilder: (sceneBuilder) =>
+      set({
+        sceneBuilder,
+      }),
+
+    reset: () =>
+      set({
+        status: "idle",
+        video: null,
+        error: null,
+        sceneBuilder: null,
+      }),
+  }));

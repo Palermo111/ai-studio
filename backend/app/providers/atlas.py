@@ -8,12 +8,25 @@ from app.exceptions import (
     InvalidResponseError,
     ProviderConnectionError,
     ProviderError,
+    TemporaryProviderError,
 )
 
 load_dotenv()
 
 
 class AtlasClient:
+
+    def _safe_headers(
+        self,
+        headers: dict,
+    ) -> dict:
+
+        safe = dict(headers)
+
+        if "Authorization" in safe:
+            safe["Authorization"] = "Bearer ********"
+
+        return safe    
 
     def __init__(self):
         self.api_key = os.getenv("ATLAS_API_KEY")
@@ -112,9 +125,10 @@ class AtlasClient:
         data: dict,
     ) -> dict:
 
-        try:
+        import json
+        import traceback
 
-            import json
+        try:
 
             print("=" * 80)
             print("ATLAS REQUEST")
@@ -123,28 +137,61 @@ class AtlasClient:
 
             with httpx.Client(timeout=600) as client:
 
-                response = client.post(
+                request = client.build_request(
+                    "POST",
                     f"{self.base_url}/{endpoint}",
                     headers=self.headers,
                     json=data,
                 )
-            
+
+                print("=" * 80)
+                print("RAW HTTP REQUEST")
+                print(request.method)
+                print(request.url)
+                print(
+                    self._safe_headers(
+                        dict(request.headers)
+                    )
+                )
+                print(request.content.decode("utf-8"))
+                print("=" * 80)
+
+                response = client.send(request)
+
             print("=" * 80)
             print("ATLAS RESPONSE")
             print("STATUS:", response.status_code)
-            print("HEADERS:", response.headers)
-            print("BODY:")
-            print(response.text)
+
+            if response.status_code >= 500:
+                print("<response body hidden>")
+            else:
+                print(response.text)
+
             print("=" * 80)
 
             self._check_response(response)
 
             return response.json()
 
-        except httpx.ConnectError as e:
-            raise ProviderConnectionError(
-                "Не удалось подключиться к Atlas."
-            ) from e
+        except Exception as e:
+
+            print("=" * 80)
+            print("ATLAS EXCEPTION")
+            traceback.print_exc()
+            print()
+
+            print("TYPE:", type(e))
+            print("ERROR:", repr(e))
+
+            if hasattr(e, "__cause__"):
+                print("CAUSE:", repr(e.__cause__))
+
+            if hasattr(e, "request"):
+                print("REQUEST:", e.request)
+
+            print("=" * 80)
+
+            raise
 
     def get(
         self,
@@ -160,6 +207,19 @@ class AtlasClient:
                     headers=self.headers,
                 )
 
+            print("=" * 80)
+            print("ATLAS POLLING")
+            print("GET:", endpoint)
+            print("STATUS:", response.status_code)
+            print("BODY:")
+
+            if response.status_code >= 500:
+                print("<response body hidden>")
+            else:
+                print(response.text)
+
+            print("=" * 80)
+
             self._check_response(response)
 
             return response.json()
@@ -174,7 +234,33 @@ class AtlasClient:
         response: httpx.Response,
     ) -> None:
 
+        if response.status_code in (502, 503, 504):
+
+            print("=" * 80)
+            print("ATLAS TEMPORARY ERROR")
+            print("STATUS:", response.status_code)
+            print("Retry later.")
+            print("=" * 80)
+
+            raise TemporaryProviderError(
+                f"Atlas temporary error ({response.status_code})"
+            )
+
         if response.status_code >= 400:
+
+            print("=" * 80)
+            print("ATLAS ERROR")
+            print("STATUS:", response.status_code)
+            print("BODY:")
+
+            content_type = response.headers.get("Content-Type", "")
+
+            if "application/json" in content_type:
+                print(response.text)
+            else:
+                print("<non-json response hidden>")
+
+            print("=" * 80)
 
             try:
                 data = response.json()

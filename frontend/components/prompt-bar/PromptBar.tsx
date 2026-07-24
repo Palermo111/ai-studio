@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useGenerationStore } from "@/store/generationStore";
-
+import { useCurrentModel } from "@/lib/model/useCurrentModel";
 import PromptInput from "./PromptInput";
 import QuickSettings from "./QuickSettings";
 import GenerateButton from "./GenerateButton";
@@ -10,6 +10,14 @@ import UploadPreview from "@/components/upload/UploadPreview";
 
 export default function PromptBar() {
   const prompt = useGenerationStore((state) => state.prompt);
+
+  const model = useCurrentModel();
+
+  const maxPromptLength =
+    model?.id.startsWith("kling")
+      ? 2500
+      : 35000;
+
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const [inputHeight, setInputHeight] = useState(96);
@@ -143,7 +151,7 @@ export default function PromptBar() {
 
           <div className="flex px-6 pb-3">
             <span className="ml-auto text-xs text-muted-foreground">
-              {prompt.length} / 35000
+              {prompt.length} / {maxPromptLength}
             </span>
           </div>
 

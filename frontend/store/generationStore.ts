@@ -24,8 +24,10 @@ interface GenerationStore {
   duration: number;
   mode: "Mini" | "Fast" | "Pro";
   audio: boolean;
-
   prompt: string;
+  negativePrompt: string;
+  cfgScale: number;
+  multiShot: boolean;
 
   setProvider: (
     provider: VideoProvider
@@ -58,6 +60,18 @@ interface GenerationStore {
   setPrompt: (
     prompt: string
   ) => void;
+
+  setNegativePrompt: (
+    prompt: string
+  ) => void;
+
+  setCfgScale: (
+    value: number
+  ) => void;
+
+  setMultiShot: (
+    value: boolean
+  ) => void;
 }
 
 export const useGenerationStore =
@@ -70,9 +84,11 @@ export const useGenerationStore =
     aspectRatio: "9:16",
     duration: 4,
     mode: "Pro",
-    audio: true,
-
+    audio: false,
     prompt: "",
+    negativePrompt: "",
+    cfgScale: 0.5,
+    multiShot: false,
 
     setProvider: (provider) =>
       set({
@@ -113,4 +129,20 @@ export const useGenerationStore =
       set({
         prompt,
       }),
+
+    setNegativePrompt: (negativePrompt) =>
+      set({
+        negativePrompt,
+      }),
+
+    setCfgScale: (cfgScale) =>
+      set({
+        cfgScale,
+      }),
+
+    setMultiShot: (multiShot) =>
+      set({
+        multiShot,
+      }),
+
   }));

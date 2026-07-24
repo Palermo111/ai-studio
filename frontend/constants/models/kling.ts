@@ -70,9 +70,20 @@ export const KLING = {
       },
 
       pricePerSecond: {
-        "720p": 0,
-        "1080p": 0,
-        "4K": 0,
+        "720p": {
+          video: 0.0714,
+          audio: 0.1071,
+        },
+
+        "1080p": {
+          video: 0.0952,
+          audio: 0.1428,
+        },
+
+        "4K": {
+          video: 0.357,
+          audio: 0.357,
+        },
       },
     },
   ] satisfies AIModel[],

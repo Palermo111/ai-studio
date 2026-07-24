@@ -8,6 +8,10 @@ from app.config import (
 )
 from app.schemas.models import SEEDANCE_20
 
+@dataclass
+class Shot:
+    prompt: str
+    duration: int
 
 @dataclass
 class VideoRequest:
@@ -28,9 +32,21 @@ class VideoRequest:
     cfg_scale: float = 0.5
     negative_prompt: str = ""
 
+    # Multi Shot
+    multi_shot: bool = False
+
+    instructions: str = ""
+
+    multi_prompt: list[Shot] = field(
+        default_factory=list
+    )
+
     # Reference images
     reference_image_paths: list[str] = field(default_factory=list)
     reference_image_urls: list[str] = field(default_factory=list)
+
+    # Kling subject references (Atlas elements)
+    kling_elements: list[dict] = field(default_factory=list)
 
     output_dir: str = DEFAULT_OUTPUT_DIR
 

@@ -26,7 +26,15 @@ export interface AIModel {
 
   capabilities: AIModelCapabilities;
 
-  pricePerSecond: Record<string, number>;
+  pricePerSecond: Partial<
+    Record<
+      string,
+      {
+        video: number;
+        audio: number;
+      }
+    >
+  >;
 }
 
 export interface AIModelHome {

@@ -71,10 +71,25 @@ export const SEEDANCE = {
       },
 
       pricePerSecond: {
-        "480p": 0.06725,
-        "720p": 0.15125,
-        "1080p": 0.34,
-        "4K": 1.36,
+        "480p": {
+          video: 0.06725,
+          audio: 0.06725,
+        },
+
+        "720p": {
+          video: 0.15125,
+          audio: 0.15125,
+        },
+
+        "1080p": {
+          video: 0.34,
+          audio: 0.34,
+        },
+
+        "4K": {
+          video: 1.36,
+          audio: 1.36,
+        },
       },
     },
   ] satisfies AIModel[],

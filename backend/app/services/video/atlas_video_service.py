@@ -2,9 +2,11 @@ import os
 import time
 from datetime import datetime
 
-from app.config import BASE_URL, POLL_INTERVAL
+from app.config import BASE_URL
 from app.database.history_service import HistoryService
 from app.providers.atlas import AtlasClient
+from app.exceptions import TemporaryProviderError
+
 from app.schemas.video_request import VideoRequest
 from app.services.video.base import BaseVideoService
 from app.services.video.payloads.kling import KlingPayload
@@ -69,6 +71,16 @@ class AtlasVideoService(BaseVideoService):
 
         request.reference_image_urls = uploaded_urls
 
+        if request.kling_elements:
+
+            for index, url in enumerate(uploaded_urls):
+
+                if index >= len(request.kling_elements):
+                    break
+
+                request.kling_elements[index]["frontal_image"] = url
+                request.kling_elements[index]["refer_images"] = [url]        
+
         payload = KlingPayload.build(request)
 
         print("=" * 80)
@@ -84,11 +96,44 @@ class AtlasVideoService(BaseVideoService):
 
         print("Prediction:", prediction_id)
 
+
+        MAX_WAIT_TIME = 20 * 60
+
+        attempt = 1
+        start_time = time.monotonic()
+
         while True:
 
-            result = self.client.get_prediction(
-                prediction_id
-            )
+            elapsed = time.monotonic() - start_time
+
+            if elapsed > MAX_WAIT_TIME:
+                raise TimeoutError(
+                    "Atlas не завершил генерацию за допустимое время."
+                )
+
+            print(f"Polling #{attempt}")
+
+            try:
+
+                result = self.client.get_prediction(
+                    prediction_id
+                )
+
+            except TemporaryProviderError:
+
+                print(
+                    "Temporary Atlas error. Retrying..."
+                )
+
+                attempt += 1
+
+                elapsed = time.monotonic() - start_time
+
+                time.sleep(
+                    self._get_poll_interval(elapsed)
+                )
+
+                continue
 
             status = result["data"]["status"]
 
@@ -111,7 +156,13 @@ class AtlasVideoService(BaseVideoService):
                     )
                 )
 
-            time.sleep(POLL_INTERVAL)
+            attempt += 1
+
+            elapsed = time.monotonic() - start_time
+
+            time.sleep(
+                self._get_poll_interval(elapsed)
+            )
 
         print("Downloading...")
 
@@ -163,6 +214,19 @@ class AtlasVideoService(BaseVideoService):
 
         if os.path.exists(path):
             os.remove(path)
+
+    def _get_poll_interval(
+        self,
+        elapsed: float,
+    ) -> int:
+
+        if elapsed < 30:
+            return 2
+
+        if elapsed < 90:
+            return 5
+
+        return 10
 
     def _get_output_dir(
         self,

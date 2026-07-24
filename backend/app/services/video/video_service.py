@@ -124,15 +124,28 @@ class VideoService:
         while True:
             result = self.client.get_absolute(polling_url)
 
-            status = result["status"]
+            print("=" * 80)
+            print("POLL RESPONSE:")
+            print(result)
+            print("=" * 80)
+
+            status = result.get("status")
+
+            print("STATUS:", status)
 
             if status == "completed":
+                print("JOB COMPLETED")
                 return
 
             if status == "failed":
+                print("JOB FAILED")
+                print(result)
+
                 raise RuntimeError(
                     result.get("error", "Неизвестная ошибка")
                 )
+
+            print(f"Waiting {POLL_INTERVAL} sec...\n")
 
             time.sleep(POLL_INTERVAL)
 

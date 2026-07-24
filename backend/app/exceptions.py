@@ -9,6 +9,12 @@ class AIStudioError(Exception):
 class ProviderError(AIStudioError):
     """Базовая ошибка AI-провайдера."""
 
+class TemporaryProviderError(ProviderError):
+    """
+    Временная ошибка Atlas (502/503/504).
+    Не означает, что генерация завершилась ошибкой.
+    """
+    pass
 
 class ProviderConnectionError(ProviderError):
     """Не удалось подключиться к AI-провайдеру."""

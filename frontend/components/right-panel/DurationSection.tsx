@@ -6,6 +6,7 @@ import Section from "./Section";
 
 import { useCurrentModel } from "@/lib/model/useCurrentModel";
 import { useGenerationStore } from "@/store/generationStore";
+import { useWorkspaceStore } from "@/store/workspaceStore";
 
 export default function DurationSection() {
   const model = useCurrentModel();
@@ -17,6 +18,12 @@ export default function DurationSection() {
   const setDuration = useGenerationStore(
     (state) => state.setDuration
   );
+
+const sceneBuilder = useWorkspaceStore(
+  (state) => state.sceneBuilder
+);
+
+const isMultiShot = sceneBuilder !== null;
 
   const durations =
     model?.capabilities.durations ?? [4];
@@ -39,9 +46,17 @@ export default function DurationSection() {
       <div className="space-y-3">
 
         <div className="flex items-center justify-between">
-          <span className="text-xs text-muted-foreground">
-            Длительность видео
-          </span>
+          <div>
+            <div className="text-xs text-muted-foreground">
+              Длительность видео
+            </div>
+
+            {isMultiShot && (
+              <div className="mt-1 text-[10px] text-muted-foreground">
+                Рассчитывается автоматически по сценам
+              </div>
+            )}
+          </div>
 
           <div className="rounded-lg bg-muted px-2.5 py-1 text-xs font-medium text-foreground">
             {duration} сек
@@ -49,6 +64,7 @@ export default function DurationSection() {
         </div>
 
         <input
+          disabled={isMultiShot}
           type="range"
           min={minDuration}
           max={maxDuration}
@@ -57,7 +73,15 @@ export default function DurationSection() {
           onChange={(e) =>
             setDuration(Number(e.target.value))
           }
-          className="w-full cursor-pointer accent-primary"
+          className={`
+            w-full
+            accent-primary
+            ${
+              isMultiShot
+                ? "cursor-not-allowed opacity-50"
+                : "cursor-pointer"
+            }
+          `}
         />
 
         <div className="flex justify-between text-[10px] text-muted-foreground">

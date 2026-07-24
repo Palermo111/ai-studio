@@ -11,11 +11,59 @@ export function buildFormData() {
 
   formData.append("prompt", payload.prompt);
 
-  formData.append("resolution", payload.resolution);
-  formData.append("aspectRatio", payload.aspectRatio);
-  formData.append("duration", String(payload.duration));
-  formData.append("mode", payload.mode);
-  formData.append("audio", String(payload.audio));
+  formData.append(
+    "negativePrompt",
+    payload.negativePrompt
+  );
+
+  formData.append(
+    "cfgScale",
+    String(payload.cfgScale)
+  );
+
+  formData.append(
+    "resolution",
+    payload.resolution
+  );
+
+  formData.append(
+    "aspectRatio",
+    payload.aspectRatio
+  );
+
+  formData.append(
+    "duration",
+    String(payload.duration)
+  );
+
+  formData.append(
+    "mode",
+    payload.mode
+  );
+
+  formData.append(
+    "audio",
+    String(payload.audio)
+  );
+
+  // --------------------------------------------------
+  // Multi Shot
+  // --------------------------------------------------
+
+  formData.append(
+    "multiShot",
+    String(payload.multiShot)
+  );
+
+  formData.append(
+    "instructions",
+    payload.instructions
+  );
+
+  formData.append(
+    "multiPrompt",
+    JSON.stringify(payload.multiPrompt)
+  );
 
   if (payload.projectId !== null) {
     formData.append(
@@ -25,6 +73,7 @@ export function buildFormData() {
   }
 
   // Keyframes
+
   if (payload.startFrameAlias) {
     formData.append(
       "startFrameAlias",
@@ -50,15 +99,25 @@ export function buildFormData() {
 
   // Добавляем изображения, выбранные как Keyframes,
   // даже если они отсутствуют в тексте промпта.
-  [payload.startFrameAlias, payload.endFrameAlias]
+
+  [
+    payload.startFrameAlias,
+    payload.endFrameAlias,
+  ]
     .filter(
-      (alias): alias is string => Boolean(alias)
+      (alias): alias is string =>
+        Boolean(alias)
     )
     .forEach((alias) => {
-      if (!references.some((r) => r.alias === alias)) {
-        const file = payload.files.find(
-          (f) => f.alias === alias
-        );
+      if (
+        !references.some(
+          (r) => r.alias === alias
+        )
+      ) {
+        const file =
+          payload.files.find(
+            (f) => f.alias === alias
+          );
 
         if (file) {
           references.push({
@@ -70,9 +129,17 @@ export function buildFormData() {
     });
 
   // Отправляем все необходимые изображения
+
   references.forEach((reference) => {
-    formData.append("files", reference.file.file);
-    formData.append("aliases", reference.alias);
+    formData.append(
+      "files",
+      reference.file.file
+    );
+
+    formData.append(
+      "aliases",
+      reference.alias
+    );
   });
 
   return formData;

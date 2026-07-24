@@ -39,6 +39,7 @@ class ProjectService:
         (project_folder / "images").mkdir(parents=True, exist_ok=True)
         (project_folder / "videos").mkdir(parents=True, exist_ok=True)
         (project_folder / "audio").mkdir(parents=True, exist_ok=True)
+        (project_folder / "elements").mkdir(parents=True, exist_ok=True)
 
         return project
 

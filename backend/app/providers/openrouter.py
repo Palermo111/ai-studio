@@ -165,11 +165,20 @@ class OpenRouterClient:
                 if isinstance(data, dict):
                     error = data.get("error", {})
 
-                    message = error.get("message")
+                    message = error.get("message", "")
                     code = error.get("code")
 
+                    # Обычная обработка по коду ошибки
                     if code in ERROR_MESSAGES:
                         message = ERROR_MESSAGES[code]
+
+                    # OpenRouter иногда прячет настоящий код
+                    # внутрь строки message
+                    else:
+                        for provider_code, provider_message in ERROR_MESSAGES.items():
+                            if provider_code in message:
+                                message = provider_message
+                                break
 
                     if not message:
                         message = str(data)

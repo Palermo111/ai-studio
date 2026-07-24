@@ -33,6 +33,9 @@ export default function GenerateButton() {
   const setError = useWorkspaceStore((state) => state.setError);
 
   const prompt = useGenerationStore((state) => state.prompt);
+  const sceneBuilder = useWorkspaceStore(
+    (state) => state.sceneBuilder
+  );
   const model = useGenerationStore((state) => state.model);
   const resolution = useGenerationStore(
     (state) => state.resolution
@@ -65,8 +68,12 @@ export default function GenerateButton() {
     usdRate
   );
 
+  const hasPrompt = sceneBuilder
+    ? sceneBuilder.scenes.length > 0
+    : prompt.trim().length > 0;
+
   const isDisabled =
-    status === "generating" || !prompt.trim();
+    status === "generating" || !hasPrompt;
 
   async function handleGenerate() {
     console.log("DEV_MODE =", DEV_MODE);

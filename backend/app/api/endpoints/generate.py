@@ -1,13 +1,17 @@
 from pathlib import Path
 from uuid import uuid4
 import traceback
-
+import json
 from fastapi import APIRouter, File, Form, HTTPException, UploadFile
+from app.services.video.payloads.kling_reference_parser import KlingReferenceParser
 
 from app.config import BASE_URL
 from app.exceptions import ProviderError
 from app.schemas.responses import GenerateResponse
-from app.schemas.video_request import VideoRequest
+from app.schemas.video_request import (
+    VideoRequest,
+    Shot,
+)
 from app.services.reference_parser import ReferenceParser
 from app.services.video.factory import VideoFactory
 
@@ -30,6 +34,13 @@ async def generate_video(
     duration: int = Form(...),
     mode: str = Form(...),
     audio: bool = Form(...),
+    negativePrompt: str = Form(""),
+    cfgScale: float = Form(0.5),
+
+    multiShot: bool = Form(False),
+    instructions: str = Form(""),
+    multiPrompt: str = Form(""),
+
     projectId: int | None = Form(None),
 
     files: list[UploadFile] = File(default=[]),
@@ -97,10 +108,29 @@ async def generate_video(
                 references[aliases[index]] = image_url
                 reference_paths[aliases[index]] = str(save_path)
 
-        parsed_prompt = ReferenceParser.replace_prompt(
-            prompt,
-            references,
-        )
+        if "kling" in model.lower():
+            parsed_prompt = KlingReferenceParser.replace_prompt(
+                prompt,
+                references,
+            )
+        else:
+            parsed_prompt = ReferenceParser.replace_prompt(
+                prompt,
+                references,
+            )
+
+        kling_elements = []
+
+        if "kling" in model.lower():
+
+            for index, image_url in enumerate(reference_image_urls):
+
+                kling_elements.append({
+                    "reference_type": "image_refer",
+                    "frontal_image": image_url,
+                    "refer_images": [image_url],
+                    "element_name": f"element_{index + 1}",
+                })
 
         start_frame_url = (
             references.get(startFrameAlias)
@@ -135,6 +165,18 @@ async def generate_video(
         print("END PATH:", end_frame_path)
         print("=" * 80)
 
+        parsed_multi_prompt = []
+
+        if multiShot and multiPrompt:
+
+            parsed_multi_prompt = [
+                Shot(
+                    prompt=item["prompt"],
+                    duration=item["duration"],
+                )
+                for item in json.loads(multiPrompt)
+            ]
+
         request = VideoRequest(
             prompt=parsed_prompt,
             provider=provider,
@@ -144,8 +186,13 @@ async def generate_video(
             aspect_ratio=aspectRatio,
             generate_audio=audio,
 
+            negative_prompt=negativePrompt,
+            cfg_scale=cfgScale,
+
             reference_image_paths=reference_image_paths,
             reference_image_urls=reference_image_urls,
+
+            kling_elements=kling_elements,
 
             project_id=projectId,
 
@@ -154,6 +201,10 @@ async def generate_video(
 
             end_frame_path=end_frame_path,
             end_frame_url=end_frame_url,
+
+            multi_shot=multiShot,
+            instructions=instructions,
+            multi_prompt=parsed_multi_prompt,
         )
 
         service = VideoFactory.create(request)
