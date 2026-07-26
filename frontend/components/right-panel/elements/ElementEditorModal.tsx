@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { X } from "lucide-react";
-
+import { getImageSize } from "@/lib/imageUtils";
 import MainReferenceSection from "./MainReferenceSection";
 import ElementInfoSection from "./ElementInfoSection";
 
@@ -84,6 +84,12 @@ export default function ElementEditorModal({
     setReplaceReferences,
   ] = useState(false);
 
+  const [errors, setErrors] = useState({
+    name: "",
+    mainReference: "",
+    references: "",
+  });
+
   useEffect(() => {
     if (open) {
       requestAnimationFrame(() =>
@@ -144,6 +150,95 @@ export default function ElementEditorModal({
     setRemoveMainReference(false);
 
     setReplaceReferences(false);
+
+    setErrors({
+      name: "",
+      mainReference: "",
+      references: "",
+    });
+  };
+
+  const validateForm = async (): Promise<boolean> => {
+    const newErrors = {
+      name: "",
+      mainReference: "",
+      references: "",
+    };
+
+    if (!name.trim()) {
+      newErrors.name = "Введите имя элемента.";
+    }
+
+    if (!mainReference) {
+      newErrors.mainReference =
+        "Загрузите главный референс.";
+    }
+
+    if (references.length === 0) {
+      newErrors.references =
+        "Добавьте минимум один дополнительный референс.";
+    }
+
+    if (
+      !newErrors.mainReference &&
+      mainReference?.file
+    ) {
+      try {
+        const { width, height } =
+          await getImageSize(
+            mainReference.file
+          );
+
+        if (
+          width < 300 ||
+          height < 300
+        ) {
+          newErrors.mainReference =
+            "Главный референс должен быть не меньше 300×300 пикселей.";
+        }
+      } catch {
+        newErrors.mainReference =
+          "Не удалось прочитать изображение.";
+      }
+    }
+
+    if (!newErrors.references) {
+      for (const reference of references) {
+        if (!reference.file) {
+          continue;
+        }
+
+        try {
+          const { width, height } =
+            await getImageSize(
+              reference.file
+            );
+
+          if (
+            width < 300 ||
+            height < 300
+          ) {
+            newErrors.references =
+              "Все дополнительные референсы должны быть не меньше 300×300 пикселей.";
+
+            break;
+          }
+        } catch {
+          newErrors.references =
+            "Не удалось прочитать одно из дополнительных изображений.";
+
+          break;
+        }
+      }
+    }
+
+    setErrors(newErrors);
+
+    return (
+      !newErrors.name &&
+      !newErrors.mainReference &&
+      !newErrors.references
+    );
   };
 
   const closeModal = () => {
@@ -155,7 +250,7 @@ export default function ElementEditorModal({
   };
 
   const handleSave = async () => {
-    if (!name.trim()) {
+    if (!(await validateForm())) {
       return;
     }
 
@@ -250,17 +345,21 @@ export default function ElementEditorModal({
           <div className="flex gap-8">
             <MainReferenceSection
               file={mainReference}
+              error={errors.mainReference}
               onFileChange={(value) => {
                 setMainReference(value);
 
+                if (errors.mainReference) {
+                  setErrors((prev) => ({
+                    ...prev,
+                    mainReference: "",
+                  }));
+                }
+
                 if (value === null) {
-                  setRemoveMainReference(
-                    true
-                  );
+                  setRemoveMainReference(true);
                 } else if (value.file) {
-                  setRemoveMainReference(
-                    false
-                  );
+                  setRemoveMainReference(false);
                 }
               }}
             />
@@ -269,17 +368,32 @@ export default function ElementEditorModal({
               name={name}
               description={description}
               references={references}
-              onNameChange={setName}
+              nameError={errors.name}
+              referencesError={errors.references}
+              onNameChange={(value) => {
+                setName(value);
+
+                if (errors.name) {
+                  setErrors((prev) => ({
+                    ...prev,
+                    name: "",
+                  }));
+                }
+              }}
               onDescriptionChange={
                 setDescription
               }
-              onReferencesChange={(
-                value
-              ) => {
+              onReferencesChange={(value) => {
                 setReferences(value);
-                setReplaceReferences(
-                  true
-                );
+
+                if (errors.references) {
+                  setErrors((prev) => ({
+                    ...prev,
+                    references: "",
+                  }));
+                }
+
+                setReplaceReferences(true);
               }}
             />
           </div>
@@ -311,7 +425,6 @@ export default function ElementEditorModal({
 
           <button
             onClick={handleSave}
-            disabled={!name.trim()}
             className="
               h-11
               rounded-xl

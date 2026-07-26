@@ -11,7 +11,11 @@ interface Props {
 
   description: string;
 
- references: LocalReference[];
+  references: LocalReference[];
+
+  nameError?: string;
+
+  referencesError?: string;
 
   onNameChange: (
     value: string
@@ -33,6 +37,8 @@ export default function ElementInfoSection({
   name,
   description,
   references,
+  nameError,
+  referencesError,
   onNameChange,
   onDescriptionChange,
   onReferencesChange,
@@ -82,6 +88,12 @@ export default function ElementInfoSection({
           "
         />
 
+        {nameError && (
+          <p className="mt-2 text-sm text-destructive">
+            {nameError}
+          </p>
+        )}
+        
         <div
           className="
             mt-1
@@ -160,6 +172,12 @@ export default function ElementInfoSection({
           references={references}
           onChange={onReferencesChange}
         />
+
+        {referencesError && (
+          <p className="mt-2 text-sm text-destructive">
+            {referencesError}
+          </p>
+        )}        
 
       </div>
 

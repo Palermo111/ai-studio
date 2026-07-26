@@ -17,6 +17,8 @@ import {
 interface Props {
   file: LocalReference | null;
 
+  error?: string;
+
   onFileChange: (
     file: LocalReference | null
   ) => void;
@@ -24,6 +26,7 @@ interface Props {
 
 export default function MainReferenceSection({
   file,
+  error,
   onFileChange,
 }: Props) {
   const inputRef =
@@ -221,6 +224,12 @@ export default function MainReferenceSection({
           ? "Заменить фото"
           : "Выбрать файл"}
       </button>
+
+      {error && (
+        <p className="mt-2 text-sm text-destructive">
+          {error}
+        </p>
+      )}
 
     </div>
   );
