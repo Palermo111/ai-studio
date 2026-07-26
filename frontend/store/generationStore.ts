@@ -130,7 +130,9 @@ export const useGenerationStore =
         prompt,
       }),
 
-    setNegativePrompt: (negativePrompt) =>
+    setNegativePrompt: (
+      negativePrompt
+    ) =>
       set({
         negativePrompt,
       }),
@@ -144,5 +146,4 @@ export const useGenerationStore =
       set({
         multiShot,
       }),
-
   }));

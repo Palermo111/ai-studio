@@ -134,6 +134,7 @@ export const useElementStore =
           name: data.name.trim(),
           description:
             data.description.trim(),
+
           mainReference:
             data.mainReference
               ? data.mainReference.file
@@ -142,6 +143,7 @@ export const useElementStore =
                   )
                 : data.mainReference.preview
               : null,
+
           references:
             data.references.map(
               (reference) =>
@@ -151,6 +153,10 @@ export const useElementStore =
                     )
                   : reference.preview
             ),
+
+          mainReferenceFile: null,
+
+          referenceFiles: [],
         };
 
         set((state) => ({
@@ -238,6 +244,12 @@ export const useElementStore =
                             )
                           : reference.preview
                     ),
+
+                  mainReferenceFile:
+                    element.mainReferenceFile,
+
+                  referenceFiles:
+                    element.referenceFiles,
                 };
               }
             );

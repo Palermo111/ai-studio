@@ -100,10 +100,31 @@ class KlingPayload:
                     request.reference_image_urls[0]
                 )
 
-            if request.kling_elements:
-                payload["elements"] = (
-                    request.kling_elements
-                )
+            if request.elements:
+
+                payload["elements"] = []
+
+                for element in request.elements:
+
+                    atlas_element = {
+                        "reference_type": "image_refer",
+                        "element_name": element["name"],
+                        "element_description": element.get(
+                            "description",
+                            "",
+                        ),
+                        "frontal_image": element.get(
+                            "frontal_image"
+                        ),
+                        "refer_images": element.get(
+                            "refer_images",
+                            [],
+                        ),
+                    }
+
+                    payload["elements"].append(
+                        atlas_element
+                    )
 
             if request.end_frame_url:
                 payload["end_image"] = (

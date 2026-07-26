@@ -6,8 +6,14 @@ interface ElementResponse {
   id: string;
   name: string;
   description: string;
+
+  // URL для UI
   main_reference: string | null;
   references: string[];
+
+  // Имена файлов для backend
+  main_reference_file: string | null;
+  reference_files: string[];
 }
 
 function mapElement(
@@ -17,9 +23,18 @@ function mapElement(
     id: element.id,
     name: element.name,
     description: element.description,
+
+    // URL для UI
     mainReference:
       element.main_reference,
-    references: element.references,
+    references:
+      element.references,
+
+    // Имена файлов для backend
+    mainReferenceFile:
+      element.main_reference_file,
+    referenceFiles:
+      element.reference_files,
   };
 }
 

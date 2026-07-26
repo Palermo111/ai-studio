@@ -1,17 +1,15 @@
-import { buildGenerationElements } from "@/lib/buildGenerationElements";
-
 import { useElementStore } from "@/store/elementStore";
 import { useGenerationStore } from "@/store/generationStore";
 import { useProjectStore } from "@/store/projectStore";
 import { useUploadStore } from "@/store/uploadStore";
 import { useWorkspaceStore } from "@/store/workspaceStore";
+import { GenerationData } from "@/types/generation";
 
-export function buildGenerationPayload() {
+export function buildGenerationData(): GenerationData {
   const generation = useGenerationStore.getState();
   const uploads = useUploadStore.getState();
   const project = useProjectStore.getState();
   const workspace = useWorkspaceStore.getState();
-  const elements = useElementStore.getState().elements;
 
   const sceneBuilder = workspace.sceneBuilder;
 
@@ -35,13 +33,34 @@ ${sceneBuilder.instructions}`;
     }
   }
 
-  const {
-    prompt: transformedPrompt,
-    elements: generationElements,
-  } = buildGenerationElements(
-    prompt,
-    elements
+  // ==========================
+  // DEBUG
+  // ==========================
+
+  console.log("========== buildGenerationData ==========");
+
+  console.log(
+    "Files:",
+    uploads.files.map((file) => ({
+      alias: file.alias,
+      name: file.file.name,
+      type: file.type,
+    }))
   );
+
+  console.log(
+    "Start Frame:",
+    uploads.startFrameAlias
+  );
+
+  console.log(
+    "End Frame:",
+    uploads.endFrameAlias
+  );
+
+  console.log("=========================================");
+
+  // ==========================
 
   return {
     // Провайдер API
@@ -54,7 +73,7 @@ ${sceneBuilder.instructions}`;
     model: generation.model,
 
     // Основной prompt
-    prompt: transformedPrompt,
+    prompt,
 
     negativePrompt: generation.negativePrompt,
     cfgScale: generation.cfgScale,
@@ -64,9 +83,6 @@ ${sceneBuilder.instructions}`;
     duration: generation.duration,
     mode: generation.mode,
     audio: generation.audio,
-
-    // Elements
-    elements: generationElements,
 
     // Multi Shot
     multiShot: sceneBuilder !== null,
@@ -83,6 +99,12 @@ ${sceneBuilder.instructions}`;
     projectId: project.activeProject?.id ?? null,
 
     files: uploads.files,
+
+    // Elements
+    // Пока пусто. На следующем этапе сюда будут
+    // автоматически подставляться элементы,
+    // найденные по @mentions в prompt.
+    elements: [],
 
     // Keyframes
     startFrameAlias: uploads.startFrameAlias,

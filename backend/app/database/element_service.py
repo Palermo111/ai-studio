@@ -251,6 +251,8 @@ class ElementService:
             "id": element["id"],
             "name": element["name"],
             "description": element["description"],
+
+            # URL для отображения в интерфейсе
             "main_reference": self.build_image_url(
                 project_id,
                 element.get("main_reference"),
@@ -265,6 +267,15 @@ class ElementService:
                     []
                 )
             ],
+
+            # Имена файлов для backend
+            "main_reference_file": element.get(
+                "main_reference"
+            ),
+            "reference_files": element.get(
+                "references",
+                []
+            ),
         }
 
     def delete(

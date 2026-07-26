@@ -40,6 +40,7 @@ async def generate_video(
     multiShot: bool = Form(False),
     instructions: str = Form(""),
     multiPrompt: str = Form(""),
+    elements: str = Form("[]"),
 
     projectId: int | None = Form(None),
 
@@ -119,19 +120,6 @@ async def generate_video(
                 references,
             )
 
-        kling_elements = []
-
-        if "kling" in model.lower():
-
-            for index, image_url in enumerate(reference_image_urls):
-
-                kling_elements.append({
-                    "reference_type": "image_refer",
-                    "frontal_image": image_url,
-                    "refer_images": [image_url],
-                    "element_name": f"element_{index + 1}",
-                })
-
         start_frame_url = (
             references.get(startFrameAlias)
             if startFrameAlias
@@ -177,6 +165,8 @@ async def generate_video(
                 for item in json.loads(multiPrompt)
             ]
 
+        parsed_elements = json.loads(elements)
+
         request = VideoRequest(
             prompt=parsed_prompt,
             provider=provider,
@@ -192,7 +182,7 @@ async def generate_video(
             reference_image_paths=reference_image_paths,
             reference_image_urls=reference_image_urls,
 
-            kling_elements=kling_elements,
+            elements=parsed_elements,
 
             project_id=projectId,
 

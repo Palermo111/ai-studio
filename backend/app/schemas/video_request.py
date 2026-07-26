@@ -45,8 +45,8 @@ class VideoRequest:
     reference_image_paths: list[str] = field(default_factory=list)
     reference_image_urls: list[str] = field(default_factory=list)
 
-    # Kling subject references (Atlas elements)
-    kling_elements: list[dict] = field(default_factory=list)
+    # Elements
+    elements: list[dict] = field(default_factory=list)
 
     output_dir: str = DEFAULT_OUTPUT_DIR
 

@@ -71,15 +71,60 @@ class AtlasVideoService(BaseVideoService):
 
         request.reference_image_urls = uploaded_urls
 
-        if request.kling_elements:
+        if request.elements:
 
-            for index, url in enumerate(uploaded_urls):
+            for element in request.elements:
 
-                if index >= len(request.kling_elements):
-                    break
+                # Главное изображение элемента
+                if element.get("mainReferenceFile"):
 
-                request.kling_elements[index]["frontal_image"] = url
-                request.kling_elements[index]["refer_images"] = [url]        
+                    image_path = os.path.join(
+                        "projects",
+                        str(request.project_id),
+                        "images",
+                        element["mainReferenceFile"],
+                    )
+
+                    print(
+                        f"Uploading element main image: {image_path}"
+                    )
+
+                    result = self.client.upload_media(
+                        image_path
+                    )
+
+                    element["frontal_image"] = (
+                        result["data"]["download_url"]
+                    )
+
+                # Дополнительные изображения
+                refer_images = []
+
+                for filename in element.get(
+                    "referenceFiles",
+                    [],
+                ):
+
+                    image_path = os.path.join(
+                        "projects",
+                        str(request.project_id),
+                        "images",
+                        filename,
+                    )
+
+                    print(
+                        f"Uploading element reference image: {image_path}"
+                    )
+
+                    result = self.client.upload_media(
+                        image_path
+                    )
+
+                    refer_images.append(
+                        result["data"]["download_url"]
+                    )
+
+                element["refer_images"] = refer_images     
 
         payload = KlingPayload.build(request)
 
